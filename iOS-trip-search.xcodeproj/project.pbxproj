@@ -1,0 +1,464 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6A6C500D1ED5261F00A14DA0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C500C1ED5261F00A14DA0 /* main.m */; };
+		6A6C50101ED5261F00A14DA0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C500F1ED5261F00A14DA0 /* AppDelegate.m */; };
+		6A6C50131ED5261F00A14DA0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50121ED5261F00A14DA0 /* ViewController.m */; };
+		6A6C50161ED5261F00A14DA0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50141ED5261F00A14DA0 /* Main.storyboard */; };
+		6A6C50181ED5261F00A14DA0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50171ED5261F00A14DA0 /* Assets.xcassets */; };
+		6A6C501B1ED5261F00A14DA0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50191ED5261F00A14DA0 /* LaunchScreen.storyboard */; };
+		6A6C50231ED5384600A14DA0 /* citylist.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50221ED5384600A14DA0 /* citylist.json */; };
+		6A6C50271ED5386D00A14DA0 /* MyCity.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50261ED5386D00A14DA0 /* MyCity.m */; };
+		6A6C502A1ED5388500A14DA0 /* MyCityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50291ED5388500A14DA0 /* MyCityManager.m */; };
+		6A6C502E1ED53CD800A14DA0 /* MyLocationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C502D1ED53CD800A14DA0 /* MyLocationView.m */; };
+		6A6C50311ED53EFD00A14DA0 /* MyCityListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50301ED53EFD00A14DA0 /* MyCityListView.m */; };
+		6A6C50341ED53F0C00A14DA0 /* MySearchResultView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50331ED53F0C00A14DA0 /* MySearchResultView.m */; };
+		6A6C50371ED53F4800A14DA0 /* MySearchBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */; };
+		6A6C50391ED58CDB00A14DA0 /* MySearchBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50381ED58CDB00A14DA0 /* MySearchBarView.xib */; };
+		BCBC54A857053F2A85FDF2D2 /* libPods-iOS-trip-search.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25992F0C725C0F77658E3B74 /* libPods-iOS-trip-search.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		25992F0C725C0F77658E3B74 /* libPods-iOS-trip-search.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-iOS-trip-search.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E21485C40D709A0551A7CE2 /* Pods-iOS-trip-search.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-trip-search.release.xcconfig"; path = "Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search.release.xcconfig"; sourceTree = "<group>"; };
+		6A6C50081ED5261F00A14DA0 /* iOS-trip-search.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS-trip-search.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A6C500C1ED5261F00A14DA0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6A6C500E1ED5261F00A14DA0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		6A6C500F1ED5261F00A14DA0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		6A6C50111ED5261F00A14DA0 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		6A6C50121ED5261F00A14DA0 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		6A6C50151ED5261F00A14DA0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		6A6C50171ED5261F00A14DA0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		6A6C501A1ED5261F00A14DA0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		6A6C501C1ED5261F00A14DA0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6A6C50221ED5384600A14DA0 /* citylist.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = citylist.json; sourceTree = "<group>"; };
+		6A6C50251ED5386D00A14DA0 /* MyCity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCity.h; sourceTree = "<group>"; };
+		6A6C50261ED5386D00A14DA0 /* MyCity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCity.m; sourceTree = "<group>"; };
+		6A6C50281ED5388500A14DA0 /* MyCityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCityManager.h; sourceTree = "<group>"; };
+		6A6C50291ED5388500A14DA0 /* MyCityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCityManager.m; sourceTree = "<group>"; };
+		6A6C502C1ED53CD800A14DA0 /* MyLocationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyLocationView.h; sourceTree = "<group>"; };
+		6A6C502D1ED53CD800A14DA0 /* MyLocationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyLocationView.m; sourceTree = "<group>"; };
+		6A6C502F1ED53EFD00A14DA0 /* MyCityListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyCityListView.h; sourceTree = "<group>"; };
+		6A6C50301ED53EFD00A14DA0 /* MyCityListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyCityListView.m; sourceTree = "<group>"; };
+		6A6C50321ED53F0C00A14DA0 /* MySearchResultView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySearchResultView.h; sourceTree = "<group>"; };
+		6A6C50331ED53F0C00A14DA0 /* MySearchResultView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySearchResultView.m; sourceTree = "<group>"; };
+		6A6C50351ED53F4800A14DA0 /* MySearchBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySearchBarView.h; sourceTree = "<group>"; };
+		6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySearchBarView.m; sourceTree = "<group>"; };
+		6A6C50381ED58CDB00A14DA0 /* MySearchBarView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MySearchBarView.xib; sourceTree = "<group>"; };
+		E96B14E8F4D1049415F6E509 /* Pods-iOS-trip-search.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-trip-search.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6A6C50051ED5261F00A14DA0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BCBC54A857053F2A85FDF2D2 /* libPods-iOS-trip-search.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6A6C4FFF1ED5261F00A14DA0 = {
+			isa = PBXGroup;
+			children = (
+				6A6C500A1ED5261F00A14DA0 /* iOS-trip-search */,
+				6A6C50091ED5261F00A14DA0 /* Products */,
+				D1843EE45B3DCA88AE241F03 /* Pods */,
+				6CF6728954E977157D76F9D1 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		6A6C50091ED5261F00A14DA0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6A6C50081ED5261F00A14DA0 /* iOS-trip-search.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6A6C500A1ED5261F00A14DA0 /* iOS-trip-search */ = {
+			isa = PBXGroup;
+			children = (
+				6A6C500E1ED5261F00A14DA0 /* AppDelegate.h */,
+				6A6C500F1ED5261F00A14DA0 /* AppDelegate.m */,
+				6A6C50111ED5261F00A14DA0 /* ViewController.h */,
+				6A6C50121ED5261F00A14DA0 /* ViewController.m */,
+				6A6C502B1ED53BF400A14DA0 /* View */,
+				6A6C50241ED5385400A14DA0 /* Model */,
+				6A6C50221ED5384600A14DA0 /* citylist.json */,
+				6A6C50141ED5261F00A14DA0 /* Main.storyboard */,
+				6A6C50171ED5261F00A14DA0 /* Assets.xcassets */,
+				6A6C50191ED5261F00A14DA0 /* LaunchScreen.storyboard */,
+				6A6C501C1ED5261F00A14DA0 /* Info.plist */,
+				6A6C500B1ED5261F00A14DA0 /* Supporting Files */,
+			);
+			path = "iOS-trip-search";
+			sourceTree = "<group>";
+		};
+		6A6C500B1ED5261F00A14DA0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6A6C500C1ED5261F00A14DA0 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		6A6C50241ED5385400A14DA0 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				6A6C50251ED5386D00A14DA0 /* MyCity.h */,
+				6A6C50261ED5386D00A14DA0 /* MyCity.m */,
+				6A6C50281ED5388500A14DA0 /* MyCityManager.h */,
+				6A6C50291ED5388500A14DA0 /* MyCityManager.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		6A6C502B1ED53BF400A14DA0 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				6A6C502C1ED53CD800A14DA0 /* MyLocationView.h */,
+				6A6C502D1ED53CD800A14DA0 /* MyLocationView.m */,
+				6A6C502F1ED53EFD00A14DA0 /* MyCityListView.h */,
+				6A6C50301ED53EFD00A14DA0 /* MyCityListView.m */,
+				6A6C50321ED53F0C00A14DA0 /* MySearchResultView.h */,
+				6A6C50331ED53F0C00A14DA0 /* MySearchResultView.m */,
+				6A6C50351ED53F4800A14DA0 /* MySearchBarView.h */,
+				6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */,
+				6A6C50381ED58CDB00A14DA0 /* MySearchBarView.xib */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		6CF6728954E977157D76F9D1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				25992F0C725C0F77658E3B74 /* libPods-iOS-trip-search.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D1843EE45B3DCA88AE241F03 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E96B14E8F4D1049415F6E509 /* Pods-iOS-trip-search.debug.xcconfig */,
+				5E21485C40D709A0551A7CE2 /* Pods-iOS-trip-search.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A6C50071ED5261F00A14DA0 /* iOS-trip-search */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A6C501F1ED5261F00A14DA0 /* Build configuration list for PBXNativeTarget "iOS-trip-search" */;
+			buildPhases = (
+				3A0DC1BDD8FF8F434F3F10B1 /* [CP] Check Pods Manifest.lock */,
+				6A6C50041ED5261F00A14DA0 /* Sources */,
+				6A6C50051ED5261F00A14DA0 /* Frameworks */,
+				6A6C50061ED5261F00A14DA0 /* Resources */,
+				2A742925D782196FD003B677 /* [CP] Embed Pods Frameworks */,
+				18047379D080BF9606EB5829 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "iOS-trip-search";
+			productName = "iOS-trip-search";
+			productReference = 6A6C50081ED5261F00A14DA0 /* iOS-trip-search.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6A6C50001ED5261F00A14DA0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = Amap;
+				TargetAttributes = {
+					6A6C50071ED5261F00A14DA0 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = YMJ372W38W;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 6A6C50031ED5261F00A14DA0 /* Build configuration list for PBXProject "iOS-trip-search" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6A6C4FFF1ED5261F00A14DA0;
+			productRefGroup = 6A6C50091ED5261F00A14DA0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A6C50071ED5261F00A14DA0 /* iOS-trip-search */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6A6C50061ED5261F00A14DA0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A6C501B1ED5261F00A14DA0 /* LaunchScreen.storyboard in Resources */,
+				6A6C50181ED5261F00A14DA0 /* Assets.xcassets in Resources */,
+				6A6C50391ED58CDB00A14DA0 /* MySearchBarView.xib in Resources */,
+				6A6C50231ED5384600A14DA0 /* citylist.json in Resources */,
+				6A6C50161ED5261F00A14DA0 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		18047379D080BF9606EB5829 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2A742925D782196FD003B677 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3A0DC1BDD8FF8F434F3F10B1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A6C50041ED5261F00A14DA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A6C50371ED53F4800A14DA0 /* MySearchBarView.m in Sources */,
+				6A6C50131ED5261F00A14DA0 /* ViewController.m in Sources */,
+				6A6C50101ED5261F00A14DA0 /* AppDelegate.m in Sources */,
+				6A6C50271ED5386D00A14DA0 /* MyCity.m in Sources */,
+				6A6C502A1ED5388500A14DA0 /* MyCityManager.m in Sources */,
+				6A6C500D1ED5261F00A14DA0 /* main.m in Sources */,
+				6A6C50341ED53F0C00A14DA0 /* MySearchResultView.m in Sources */,
+				6A6C502E1ED53CD800A14DA0 /* MyLocationView.m in Sources */,
+				6A6C50311ED53EFD00A14DA0 /* MyCityListView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		6A6C50141ED5261F00A14DA0 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A6C50151ED5261F00A14DA0 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		6A6C50191ED5261F00A14DA0 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6A6C501A1ED5261F00A14DA0 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		6A6C501D1ED5261F00A14DA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		6A6C501E1ED5261F00A14DA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6A6C50201ED5261F00A14DA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E96B14E8F4D1049415F6E509 /* Pods-iOS-trip-search.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = YMJ372W38W;
+				INFOPLIST_FILE = "iOS-trip-search/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.autonavi.iOS-trip-search";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "dc33f640-6181-4574-b00d-9cd2874a7f9a";
+				PROVISIONING_PROFILE_SPECIFIER = openPlatform_development;
+			};
+			name = Debug;
+		};
+		6A6C50211ED5261F00A14DA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5E21485C40D709A0551A7CE2 /* Pods-iOS-trip-search.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEVELOPMENT_TEAM = YMJ372W38W;
+				INFOPLIST_FILE = "iOS-trip-search/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.autonavi.iOS-trip-search";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "a892512d-fe94-4702-b716-0b66880b936d";
+				PROVISIONING_PROFILE_SPECIFIER = openPlatformInhouse;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6A6C50031ED5261F00A14DA0 /* Build configuration list for PBXProject "iOS-trip-search" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A6C501D1ED5261F00A14DA0 /* Debug */,
+				6A6C501E1ED5261F00A14DA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6A6C501F1ED5261F00A14DA0 /* Build configuration list for PBXNativeTarget "iOS-trip-search" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A6C50201ED5261F00A14DA0 /* Debug */,
+				6A6C50211ED5261F00A14DA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6A6C50001ED5261F00A14DA0 /* Project object */;
+}
