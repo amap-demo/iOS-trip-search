@@ -8,13 +8,34 @@
 
 #import <UIKit/UIKit.h>
 
+@class MySearchBarView;
+
+@protocol MySearchBarViewDelegate <NSObject>
+@optional
+
+- (void)searchBarView:(MySearchBarView *)searchBarView didSearchTextChanged:(NSString *)text;
+- (void)searchBarView:(MySearchBarView *)searchBarView didCityTextChanged:(NSString *)text;
+- (void)searchBarView:(MySearchBarView *)searchBarView didCityTextShown:(BOOL)shown;
+
+- (void)didCancelButtonTapped:(MySearchBarView *)searchBarView;
+
+
+@end
+
 @interface MySearchBarView : UIView
 
-//@property (nonatomic, strong) UITextView *searchTextView;
-//@property (nonatomic, strong) UITextView *cityTextView;
-//@property (nonatomic, strong) UITextView *cityButton;
-@property (weak, nonatomic) IBOutlet UITextField *searchTextView;
+@property (nonatomic, weak) id<MySearchBarViewDelegate> delegate;
 
-@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
+@property (nonatomic, copy) NSString *currentCityName;
+@property (nonatomic, copy) NSString *currentSearchKeywords;
+
+@property (nonatomic, copy) NSString *searchTextPlaceholder;
+
+@property (nonatomic, assign) BOOL doubleSearchModeEnable;// 同时有city和关键字搜索，默认为NO。
+
+- (void)reset;
+
+- (void)resignFirstResponder;
+- (void)becomeFirstResponder;
 
 @end

@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+@class AMapPOI;
 
 @interface MyLocationView : UIView
+@property (weak, nonatomic) IBOutlet UIButton *startButton;
+@property (weak, nonatomic) IBOutlet UIButton *endButton;
+
+
+@property (nonatomic, strong) AMapPOI *startPOI;
+@property (nonatomic, strong) AMapPOI *endPOI;
 
 @end

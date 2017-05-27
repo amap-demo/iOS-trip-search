@@ -13,6 +13,9 @@
 
 + (instancetype)sharedInstance;
 
+@property (nonatomic, strong) MyCity *currentCity; // 当前城市
+@property (nonatomic, strong) MyCity *locationCity; // 定位城市
+
 @property (nonatomic, readonly) NSArray<MyCity *> *hotCities;
 @property (nonatomic, readonly) NSArray<MyCity *> *allCities;
 

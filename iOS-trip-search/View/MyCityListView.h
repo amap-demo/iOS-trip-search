@@ -16,14 +16,16 @@
 @optional
 
 - (void)cityListView:(MyCityListView *)listView didCitySelected:(MyCity *)city;
+- (void)didCityListViewwScroll:(MyCityListView *)listView;
 
 @end
 
 @interface MyCityListView : UIView
-@property (nonatomic, strong) MyCity *locationCity;
 @property (nonatomic, weak) id<MyCityListViewDelegate> delegate;
+
+@property (nonatomic, strong) MyCity *locationCity;
 @property (nonatomic, copy) NSString *filterKeywords;
 
-- (void)resetListView;
+- (void)reset;
 
 @end

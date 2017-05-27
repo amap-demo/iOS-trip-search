@@ -82,10 +82,11 @@
 
 #pragma mark - Interfaces
 
-- (void)resetListView
+- (void)reset
 {
-    [self.tableView scrollsToTop];
     [self setFilterKeywords:@""];
+    
+    self.tableView.contentOffset = CGPointMake(0, 0);
 }
 
 - (void)setFilterKeywords:(NSString *)filterKeywords
@@ -95,6 +96,13 @@
     
     [self.searchTableView reloadData];
     self.searchTableView.hidden = self.searchCities.count == 0;
+}
+
+- (void)setLocationCity:(MyCity *)locationCity
+{
+    _locationCity = locationCity;
+    
+    [self.tableView reloadData];
 }
 
 #pragma mark - Handler
@@ -202,6 +210,8 @@
                                       reuseIdentifier:cellIdentifier];
     }
     
+    cell.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
+    
     MyCity *selectedCity = [self cityForTableView:tableView atIndexPath:indexPath];
     
     if (tableView == self.tableView && indexPath.section == 0) {
@@ -240,5 +250,14 @@
     }
 }
 
+#pragma mark - 
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if ([self.delegate respondsToSelector:@selector(didCityListViewwScroll:)])
+    {
+        [self.delegate didCityListViewwScroll:self];
+    }
+}
 
 @end

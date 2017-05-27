@@ -11,29 +11,57 @@
 #import <AMapSearchKit/AMapSearchKit.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
 
+#import "MyCityManager.h"
+#import "MyRecordManager.h"
+
 #import "MyCityListView.h"
 #import "MySearchResultView.h"
 #import "MySearchBarView.h"
-#import "MyCityManager.h"
-#import "MySearchBarView.h"
+#import "MyLocationView.h"
 
-#define kTableViewMargin    10
+#import "AddressSettingViewController.h"
+
+#define kTableViewMargin    8
 #define kNaviBarHeight      60
+#define kLocationButtonHeight      48
 
-@interface ViewController ()<MAMapViewDelegate, AMapSearchDelegate, MyCityListViewDelegate>
+typedef NS_ENUM(NSInteger, CurrentGetLocationType)
+{
+    CurrentGetLocationTypeStart = 0,
+    CurrentGetLocationTypeEnd = 1,
+};
+
+typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
+{
+    CurrentAddressSettingTypeNone = 0,
+    CurrentAddressSettingTypeHome = 1,
+    CurrentAddressSettingTypeCompany = 2,
+};
+
+@interface ViewController ()<MAMapViewDelegate, AMapSearchDelegate, MyCityListViewDelegate, MySearchBarViewDelegate, MySearchResultViewDelegate, AddressSettingViewControllerDelegate>
 
 @property (nonatomic, strong) MAMapView *mapView;
 @property (nonatomic, strong) AMapSearchAPI *search;
 
 @property (nonatomic, strong) UIButton *titleButton;
 
+@property (nonatomic, strong) UIView *listContainerView;
+
 @property (nonatomic, strong) MyCityListView *cityListView;
 @property (nonatomic, strong) MySearchResultView *searchResultView;
 
 @property (nonatomic, strong) MySearchBarView *searchBar;
+@property (nonatomic, strong) MyLocationView *locationView;
 
-@property (nonatomic, strong) MyCity *currentCity;
-@property (nonatomic, strong) MyCity *locationCity;
+@property (nonatomic, assign) CurrentGetLocationType currentLocationType;
+@property (nonatomic, assign) CurrentAddressSettingType currentAddressSettingType;
+
+@property (nonatomic, strong) AMapPOIKeywordsSearchRequest *currentRequest;
+
+@property (nonatomic, assign) BOOL locationRegeoRequested;
+
+@property (nonatomic, strong) MAPointAnnotation *startAnnotation;
+@property (nonatomic, strong) MAPointAnnotation *endAnnotation;
 
 @end
 
@@ -47,14 +75,18 @@
     
     [self initMapView];
     
-    // init the city list
-    [MyCityManager sharedInstance];
-    
     [self initTitleButton];
-    
-    [self locatingCurrentCity];
-    
     [self initSearchBarView];
+    
+    [self initLocationView];
+    [self initListContainerView];
+    
+    [self initControlButtons];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -67,12 +99,14 @@
 - (void)initMapView
 {
     
-    [AMapServices sharedServices].apiKey = @"";
+    [AMapServices sharedServices].apiKey = @"2979543ece3f8e50843cf4eeff6bd670";
     
     self.mapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
     self.mapView.delegate = self;
     self.mapView.showsScale = NO;
     self.mapView.showsCompass = NO;
+    self.mapView.rotateEnabled = NO;
+    self.mapView.rotateCameraEnabled = NO;
     
     [self.mapView setShowsUserLocation:YES];
     
@@ -106,41 +140,123 @@
 
 - (void)initSearchBarView
 {
-    self.searchBar = [[[NSBundle mainBundle] loadNibNamed:@"MySearchBarView" owner:nil options:nil] lastObject];
-    
-    self.searchBar.frame = CGRectMake(0, -kNaviBarHeight, self.view.bounds.size.width, kNaviBarHeight);
+    self.searchBar = [[MySearchBarView alloc] initWithFrame:CGRectMake(0, -kNaviBarHeight, self.view.bounds.size.width, kNaviBarHeight)];
+    self.searchBar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.searchBar.delegate = self;
     
     [self.view addSubview:self.searchBar];
-    
-    [self.searchBar.cancelButton addTarget:self action:@selector(searchBarCancelAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.searchBar.searchTextView addTarget:self action:@selector(textFieldValueChanged:) forControlEvents:UIControlEventEditingChanged];
 }
 
-- (MyCityListView *)cityListView
+- (void)initLocationView
 {
-    if (_cityListView == nil) {
-        _cityListView = [[MyCityListView alloc] initWithFrame:CGRectMake(kTableViewMargin, CGRectGetMaxY(self.view.bounds), self.view.bounds.size.width - kTableViewMargin * 2, self.view.bounds.size.height - kTableViewMargin - kNaviBarHeight)];
-        
-        _cityListView.delegate = self;
-        
-        [self.view addSubview:_cityListView];
+    self.locationView = [[NSBundle mainBundle] loadNibNamed:@"MyLocationView" owner:nil options:nil].lastObject;
+    self.locationView.frame = CGRectMake(0, 0, self.view.bounds.size.width - kTableViewMargin * 2, kLocationButtonHeight * 2);
+    
+    self.locationView.center = CGPointMake(self.view.center.x, CGRectGetHeight(self.view.bounds) - kLocationButtonHeight - kTableViewMargin);
+    
+    self.locationView.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleWidth;
+    
+    [self.view addSubview:self.locationView];
+    
+    //
+    [self.locationView.startButton addTarget:self action:@selector(startLocationTapped:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.locationView.endButton addTarget:self action:@selector(endLocationTapped:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)initListContainerView
+{
+    self.listContainerView = [[UIView alloc] initWithFrame:CGRectMake(kTableViewMargin, CGRectGetMaxY(self.view.bounds), self.view.bounds.size.width - kTableViewMargin * 2, self.view.bounds.size.height - kTableViewMargin - kNaviBarHeight)];
+    self.listContainerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    self.listContainerView.layer.shadowOpacity = 0.3;
+    self.listContainerView.layer.shadowOffset = CGSizeMake(0, 0.5);
+    [self.view addSubview:self.listContainerView];
+    
+    
+    //
+    _cityListView = [[MyCityListView alloc] initWithFrame:self.listContainerView.bounds];
+    _cityListView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _cityListView.delegate = self;
+    
+    [self.listContainerView addSubview:_cityListView];
+    
+    _searchResultView = [[MySearchResultView alloc] initWithFrame:self.listContainerView.bounds];
+    _searchResultView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _searchResultView.delegate = self;
+    
+    [_searchResultView updateAddressSetting];
+    
+    [self.listContainerView addSubview:_searchResultView];
+
+}
+
+- (void)initControlButtons
+{
+    UIButton *buttonSetting = [[UIButton alloc] init];
+    [buttonSetting setImage:[UIImage imageNamed:@"icon_setting"] forState:UIControlStateNormal];
+    
+    [buttonSetting sizeToFit];
+    buttonSetting.center = CGPointMake(10 + buttonSetting.bounds.size.width / 2.0, CGRectGetHeight(self.view.bounds) - 120 - buttonSetting.bounds.size.height / 2.0);
+    [self.mapView addSubview:buttonSetting];
+    
+    [buttonSetting addTarget:self action:@selector(onSettingAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+    //location
+    UIButton *buttonLocation = [[UIButton alloc] init];
+    [buttonLocation setImage:[UIImage imageNamed:@"icon_location"] forState:UIControlStateNormal];
+    [buttonLocation sizeToFit];
+    buttonLocation.center = CGPointMake(10 + buttonLocation.bounds.size.width / 2.0, CGRectGetMinY(buttonSetting.frame) - 10 - buttonLocation.bounds.size.height / 2.0);
+    [self.mapView addSubview:buttonLocation];
+    
+    [buttonLocation addTarget:self action:@selector(onLocationAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+}
+
+- (MAPointAnnotation *)startAnnotation
+{
+    if (_startAnnotation == nil) {
+        _startAnnotation = [[MAPointAnnotation alloc] init];
+        _startAnnotation.title = @"start";
     }
     
-    _cityListView.locationCity = self.locationCity;
-    return _cityListView;
+    return _startAnnotation;
+}
+
+- (MAPointAnnotation *)endAnnotation
+{
+    if (_endAnnotation == nil) {
+        _endAnnotation = [[MAPointAnnotation alloc] init];
+        _endAnnotation.title = @"end";
+    }
+    
+    return _endAnnotation;
 }
 
 #pragma mark - handler
 
-- (void)locatingCurrentCity
+- (void)updateCurrentCity:(MyCity *)currentCity
 {
-    self.locationCity = [[MyCity alloc] init];
-    self.locationCity.name = @"北京";
-    self.locationCity.pinyin = @"Beijing";
+    [MyCityManager sharedInstance].currentCity = currentCity;
+    self.searchBar.currentCityName = currentCity.name;
     
-    [self updateTitleWithString:self.locationCity.name];
+    [self updateTitleWithString:currentCity.name];
 }
 
+- (void)locatingCurrentCity
+{
+    if ([MyCityManager sharedInstance].locationCity) {
+        return;
+    }
+    
+    if (self.locationRegeoRequested) {
+        return;
+    }
+    
+    self.locationRegeoRequested = YES;
+    
+    [self searchReGeocodeWithLocation:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.location.coordinate.latitude longitude:self.mapView.userLocation.location.coordinate.longitude]];
+}
 
 - (void)updateTitleWithString:(NSString *)title
 {
@@ -153,14 +269,24 @@
     NSLog(@"title: %@", title);
 }
 
-- (void)showCityListView
+- (void)showCityListViewOnlyCity:(BOOL)onlyCity
 {
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    [self.cityListView resetListView];
-    self.searchBar.searchTextView.text = @"";
+    [self.cityListView reset];
+    self.searchResultView.poiArray = nil;
+    
+    self.searchBar.doubleSearchModeEnable = !onlyCity;
+    
+    self.searchResultView.hidden = onlyCity;
+    if (!onlyCity) {
+        [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:[MyCityManager sharedInstance].currentCity];
+    }
+    
+    [self.searchBar reset];
+    [self.searchBar becomeFirstResponder];
     
     [UIView animateWithDuration:0.3 animations:^{
-        self.cityListView.frame = CGRectMake(kTableViewMargin, kTableViewMargin + kNaviBarHeight, self.cityListView.frame.size.width, self.cityListView.frame.size.height);
+        self.listContainerView.frame = CGRectMake(kTableViewMargin, kTableViewMargin + kNaviBarHeight, self.listContainerView.frame.size.width, self.listContainerView.frame.size.height);
         
         self.searchBar.frame = CGRectMake(0, 0, self.view.bounds.size.width, kNaviBarHeight);
     }];
@@ -169,41 +295,237 @@
 - (void)hideCityListView
 {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+    [self.searchBar resignFirstResponder];
     
-    [self.searchBar.searchTextView resignFirstResponder];
     [UIView animateWithDuration:0.3 animations:^{
-        self.cityListView.frame = CGRectMake(kTableViewMargin, CGRectGetMaxY(self.view.bounds), self.cityListView.frame.size.width, self.cityListView.frame.size.height);
+        self.listContainerView.frame = CGRectMake(kTableViewMargin, CGRectGetMaxY(self.view.bounds), self.listContainerView.frame.size.width, self.listContainerView.frame.size.height);
         
         self.searchBar.frame = CGRectMake(0, -kNaviBarHeight, self.view.bounds.size.width, kNaviBarHeight);
     }];
 }
 
+- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+{
+    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
+    request.keywords = keyword;
+    request.cityLimit = YES;
+    
+    request.city = city.name;
+    
+    //TODO: 需要设置location和sortrule
+    
+    [self.search AMapPOIKeywordsSearch:request];
+    
+    self.currentRequest = request;
+}
+
+- (void)addPositionAnnotation:(MAPointAnnotation *)annotation forPOI:(AMapPOI *)poi
+{
+    AMapGeoPoint *location = poi.location;
+    
+    NSLog(@"add poi :%@", poi.name);
+    
+    // add
+    if (annotation == self.startAnnotation && poi.exitLocation != nil) {
+        location = poi.exitLocation;
+    }
+    
+    if (annotation == self.endAnnotation && poi.enterLocation != nil) {
+        location = poi.enterLocation;
+    }
+    
+    annotation.coordinate = CLLocationCoordinate2DMake(location.latitude, location.longitude);
+    
+    [self.mapView addAnnotation:annotation];
+    
+    if (self.locationView.startPOI && self.locationView.endPOI) {
+        [self.mapView showAnnotations:@[self.startAnnotation, self.endAnnotation] edgePadding:UIEdgeInsetsMake(120, 80, 140, 80) animated:YES];
+    }
+    else if (self.locationView.startPOI){ // startAnnotation 应该保证一直存在
+        [self.mapView showAnnotations:@[self.startAnnotation] animated:NO];
+        [self.mapView setZoomLevel:16 animated:YES];
+    }
+}
+
+- (void)setLocationPOI:(AMapPOI *)poi forType:(CurrentGetLocationType)type
+{
+    if (type == CurrentGetLocationTypeStart) {
+        self.locationView.startPOI = poi;
+        [self addPositionAnnotation:self.startAnnotation forPOI:poi];
+    }
+    else {
+        self.locationView.endPOI = poi;
+        [self addPositionAnnotation:self.endAnnotation forPOI:poi];
+    }
+}
+
+- (void)searchReGeocodeWithLocation:(AMapGeoPoint *)location
+{
+    AMapReGeocodeSearchRequest *regeo = [[AMapReGeocodeSearchRequest alloc] init];
+    
+    regeo.location = location;
+    regeo.requireExtension = YES;
+    [self.search AMapReGoecodeSearch:regeo];
+}
+
+- (void)searchGeocodeWithName:(NSString *)cityName
+{
+    AMapGeocodeSearchRequest *geo = [[AMapGeocodeSearchRequest alloc] init];
+    geo.address = cityName;
+    geo.city = cityName;
+    [self.search AMapGeocodeSearch:geo];
+}
+
 #pragma mark - actions
 
-- (void)searchBarCancelAction:(UIButton *)sender
+- (void)onLocationAction:(UIButton *)sender
 {
-    [self hideCityListView];
+    self.mapView.userTrackingMode = MAUserTrackingModeFollow;
+}
+
+- (void)onSettingAction:(UIButton *)sender
+{
+    NSLog(@"clear the address setting for home & company");
+    [MyRecordManager sharedInstance].home = nil;
+    [MyRecordManager sharedInstance].company = nil;
+    
+    [self.searchResultView updateAddressSetting];
+}
+
+- (void)startLocationTapped:(UIButton *)sender
+{
+    self.currentLocationType = CurrentGetLocationTypeStart;
+    self.searchBar.searchTextPlaceholder = @"您现在在哪儿";
+    
+    [self showCityListViewOnlyCity:NO];
+}
+
+- (void)endLocationTapped:(UIButton *)sender
+{
+    self.currentLocationType = CurrentGetLocationTypeEnd;
+    self.searchBar.searchTextPlaceholder = @"您要去哪儿";
+    
+    [self showCityListViewOnlyCity:NO];
 }
 
 - (void)titleButtonTapped:(UIButton *)sender
 {
-    [self showCityListView];
+    self.searchBar.searchTextPlaceholder = @"请输入出发城市";
+    [self showCityListViewOnlyCity:YES];
 }
 
-- (void)textFieldValueChanged:(UITextField *)textView
+#pragma mark - MySearchBarViewDelegate
+
+- (void)searchBarView:(MySearchBarView *)searchBarView didSearchTextChanged:(NSString *)text
 {
-    if (textView == self.searchBar.searchTextView) {
-        self.cityListView.filterKeywords = textView.text;
+    if (!self.searchBar.doubleSearchModeEnable) {
+        self.cityListView.filterKeywords = text;
     }
+    else {
+        [self searchPoiByKeyword:text city:[MyCityManager sharedInstance].currentCity];
+    }
+}
+
+- (void)searchBarView:(MySearchBarView *)searchBarView didCityTextChanged:(NSString *)text
+{
+    if (self.searchBar.doubleSearchModeEnable) {
+        self.cityListView.filterKeywords = text;
+    }
+}
+
+- (void)didCancelButtonTapped:(MySearchBarView *)searchBarView
+{
+    [self hideCityListView];
+}
+
+- (void)searchBarView:(MySearchBarView *)searchBarView didCityTextShown:(BOOL)shown
+{
+    self.searchResultView.hidden = shown;
 }
 
 #pragma mark - MyCityListViewDelegate
 
 - (void)cityListView:(MyCityListView *)listView didCitySelected:(MyCity *)city
 {
-    self.currentCity = city;
-    [self updateTitleWithString:city.name];
+    MyCity *oldCity = [MyCityManager sharedInstance].currentCity;
+    [self updateCurrentCity:city];
+    
+    // 城市改变后清空
+    if (![oldCity.name isEqualToString:city.name]) {
+        self.locationView.endPOI = nil;
+        self.locationView.startPOI = nil;
+        // remove
+        [self.mapView removeAnnotation:self.startAnnotation];
+        [self.mapView removeAnnotation:self.endAnnotation];
+        
+    }
+    
+    if (!self.searchBar.doubleSearchModeEnable) {
+        [self hideCityListView];
+        
+        [self searchGeocodeWithName:city.name];
+    }
+    else {
+        
+        if (![oldCity.name isEqualToString:city.name]) {
+            [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:[MyCityManager sharedInstance].currentCity];
+        }
+    }
+}
+
+- (void)didCityListViewwScroll:(MyCityListView *)listView
+{
+    [self.searchBar resignFirstResponder];
+}
+
+
+#pragma mark - MySearchResultViewDelegate
+
+- (void)resultListView:(MySearchResultView *)listView didPOISelected:(AMapPOI *)poi
+{
+    [self setLocationPOI:poi forType:self.currentLocationType];
+    
     [self hideCityListView];
+}
+
+- (void)resultListView:(MySearchResultView *)listView didHomeSelected:(AMapPOI *)home
+{
+    if (home) {
+        [self setLocationPOI:home forType:self.currentLocationType];
+        [self hideCityListView];
+    }
+    else {
+        // set home
+        self.currentAddressSettingType = CurrentAddressSettingTypeHome;
+        AddressSettingViewController *vc = [[AddressSettingViewController alloc] init];
+        vc.delegate = self;
+        vc.currentCity = [MyCityManager sharedInstance].locationCity;
+        vc.searchTextPlaceholder = @"输入家的地址";
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+}
+
+- (void)resultListView:(MySearchResultView *)listView didCompanySelected:(AMapPOI *)company
+{
+    if (company) {
+        [self setLocationPOI:company forType:self.currentLocationType];
+        [self hideCityListView];
+    }
+    else {
+        // set company
+        self.currentAddressSettingType = CurrentAddressSettingTypeCompany;
+        AddressSettingViewController *vc = [[AddressSettingViewController alloc] init];
+        vc.delegate = self;
+        vc.currentCity = [MyCityManager sharedInstance].locationCity;
+        vc.searchTextPlaceholder = @"输入公司地址";
+        
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+}
+
+- (void)didResultListViewScroll:(MySearchResultView *)listView
+{
+    [self.searchBar resignFirstResponder];
 }
 
 #pragma mark - MAMapViewDelegate
@@ -213,6 +535,114 @@
     if (!updatingLocation) {
         return;
     }
+    
+    [self locatingCurrentCity];
+}
+
+- (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation
+{
+    if ([annotation isKindOfClass:[MAUserLocation class]]) {
+        return nil;
+    }
+    
+    if ([annotation isKindOfClass:[MAPointAnnotation class]])
+    {
+        static NSString *pointReuseIndetifier = @"pointReuseIndetifier";
+        MAAnnotationView *annotationView = (MAAnnotationView*)[mapView dequeueReusableAnnotationViewWithIdentifier:pointReuseIndetifier];
+        if (annotationView == nil)
+        {
+            annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:pointReuseIndetifier];
+            
+            annotationView.canShowCallout = NO;
+        }
+        
+        annotationView.image = (annotation == self.startAnnotation) ? [UIImage imageNamed:@"default_navi_route_startpoint"] : [UIImage imageNamed:@"default_navi_route_endpoint"];
+
+        
+        return annotationView;
+    }
+    
+    return nil;
+
+}
+
+#pragma mark - AddressSettingViewControllerDelegate
+
+- (void)addressSettingViewController:(AddressSettingViewController *)viewController didPOISelected:(AMapPOI *)poi
+{
+    if (self.currentAddressSettingType == CurrentAddressSettingTypeHome) {
+        
+        [MyRecordManager sharedInstance].home = poi;
+    }
+    else if (self.currentAddressSettingType == CurrentAddressSettingTypeCompany) {
+        [MyRecordManager sharedInstance].company = poi;
+    }
+    
+    [self.searchResultView updateAddressSetting];
+    [self.navigationController popViewControllerAnimated:YES];
+    self.currentAddressSettingType = CurrentAddressSettingTypeNone;
+}
+
+- (void)didCancelButtonTappedForAddressSettingViewController:(AddressSettingViewController *)viewController
+{
+    [self.navigationController popViewControllerAnimated:YES];
+    self.currentAddressSettingType = CurrentAddressSettingTypeNone;
+}
+
+
+#pragma mark - AMapSearchDelegate
+
+- (void)AMapSearchRequest:(id)request didFailWithError:(NSError *)error
+{
+    NSLog(@"search error :%@", error);
+}
+
+- (void)onPOISearchDone:(AMapPOISearchBaseRequest *)request response:(AMapPOISearchResponse *)response
+{
+    if (self.currentRequest == request) {
+        self.searchResultView.poiArray = response.pois;
+    }
+    else {
+//        self.searchResultView.poiArray = nil;
+    }
+}
+
+- (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
+{
+    if (response.regeocode == nil) {
+        return;
+    }
+    
+    if ([MyCityManager sharedInstance].locationCity == nil) {
+        [MyCityManager sharedInstance].locationCity = [[MyCity alloc] init];
+        [MyCityManager sharedInstance].locationCity.name = response.regeocode.addressComponent.city;
+        
+        self.cityListView.locationCity = [MyCityManager sharedInstance].locationCity;
+        
+        if ([MyCityManager sharedInstance].currentCity == nil) {
+            [self updateCurrentCity:[MyCityManager sharedInstance].locationCity];
+        }
+
+    }
+    
+    // just regeo for poi
+    self.locationView.startPOI = response.regeocode.pois.firstObject;
+    [self addPositionAnnotation:self.startAnnotation forPOI:self.locationView.startPOI];
+}
+
+- (void)onGeocodeSearchDone:(AMapGeocodeSearchRequest *)request response:(AMapGeocodeSearchResponse *)response
+{
+    if (response.geocodes.count == 0)
+    {
+        return;
+    }
+    AMapGeocode *geocode = response.geocodes.firstObject;
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(geocode.location.latitude, geocode.location.longitude) animated:YES];
+    
+    [self searchReGeocodeWithLocation:geocode.location];
+    
+    NSLog(@"move to %@ %@", geocode.city, geocode.location.formattedDescription);
+    
 }
 
 @end

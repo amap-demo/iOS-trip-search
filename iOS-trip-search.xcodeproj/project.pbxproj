@@ -20,7 +20,11 @@
 		6A6C50311ED53EFD00A14DA0 /* MyCityListView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50301ED53EFD00A14DA0 /* MyCityListView.m */; };
 		6A6C50341ED53F0C00A14DA0 /* MySearchResultView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50331ED53F0C00A14DA0 /* MySearchResultView.m */; };
 		6A6C50371ED53F4800A14DA0 /* MySearchBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */; };
-		6A6C50391ED58CDB00A14DA0 /* MySearchBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50381ED58CDB00A14DA0 /* MySearchBarView.xib */; };
+		6A6C503D1ED6DE5A00A14DA0 /* MyLocationView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C503C1ED6DE5A00A14DA0 /* MyLocationView.xib */; };
+		6A6C50401ED8261700A14DA0 /* MyRecordManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C503F1ED8261700A14DA0 /* MyRecordManager.m */; };
+		6A6C50441ED8313300A14DA0 /* MyLocationHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50421ED8313300A14DA0 /* MyLocationHeaderCell.m */; };
+		6A6C50451ED8313300A14DA0 /* MyLocationHeaderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50431ED8313300A14DA0 /* MyLocationHeaderCell.xib */; };
+		6A6C50481ED9330A00A14DA0 /* AddressSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C50471ED9330A00A14DA0 /* AddressSettingViewController.m */; };
 		BCBC54A857053F2A85FDF2D2 /* libPods-iOS-trip-search.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25992F0C725C0F77658E3B74 /* libPods-iOS-trip-search.a */; };
 /* End PBXBuildFile section */
 
@@ -50,7 +54,14 @@
 		6A6C50331ED53F0C00A14DA0 /* MySearchResultView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySearchResultView.m; sourceTree = "<group>"; };
 		6A6C50351ED53F4800A14DA0 /* MySearchBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MySearchBarView.h; sourceTree = "<group>"; };
 		6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MySearchBarView.m; sourceTree = "<group>"; };
-		6A6C50381ED58CDB00A14DA0 /* MySearchBarView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MySearchBarView.xib; sourceTree = "<group>"; };
+		6A6C503C1ED6DE5A00A14DA0 /* MyLocationView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MyLocationView.xib; sourceTree = "<group>"; };
+		6A6C503E1ED8261700A14DA0 /* MyRecordManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyRecordManager.h; sourceTree = "<group>"; };
+		6A6C503F1ED8261700A14DA0 /* MyRecordManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyRecordManager.m; sourceTree = "<group>"; };
+		6A6C50411ED8313300A14DA0 /* MyLocationHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyLocationHeaderCell.h; sourceTree = "<group>"; };
+		6A6C50421ED8313300A14DA0 /* MyLocationHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyLocationHeaderCell.m; sourceTree = "<group>"; };
+		6A6C50431ED8313300A14DA0 /* MyLocationHeaderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MyLocationHeaderCell.xib; sourceTree = "<group>"; };
+		6A6C50461ED9330A00A14DA0 /* AddressSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressSettingViewController.h; sourceTree = "<group>"; };
+		6A6C50471ED9330A00A14DA0 /* AddressSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddressSettingViewController.m; sourceTree = "<group>"; };
 		E96B14E8F4D1049415F6E509 /* Pods-iOS-trip-search.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-trip-search.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,6 +102,8 @@
 				6A6C500F1ED5261F00A14DA0 /* AppDelegate.m */,
 				6A6C50111ED5261F00A14DA0 /* ViewController.h */,
 				6A6C50121ED5261F00A14DA0 /* ViewController.m */,
+				6A6C50461ED9330A00A14DA0 /* AddressSettingViewController.h */,
+				6A6C50471ED9330A00A14DA0 /* AddressSettingViewController.m */,
 				6A6C502B1ED53BF400A14DA0 /* View */,
 				6A6C50241ED5385400A14DA0 /* Model */,
 				6A6C50221ED5384600A14DA0 /* citylist.json */,
@@ -118,6 +131,8 @@
 				6A6C50261ED5386D00A14DA0 /* MyCity.m */,
 				6A6C50281ED5388500A14DA0 /* MyCityManager.h */,
 				6A6C50291ED5388500A14DA0 /* MyCityManager.m */,
+				6A6C503E1ED8261700A14DA0 /* MyRecordManager.h */,
+				6A6C503F1ED8261700A14DA0 /* MyRecordManager.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -127,13 +142,16 @@
 			children = (
 				6A6C502C1ED53CD800A14DA0 /* MyLocationView.h */,
 				6A6C502D1ED53CD800A14DA0 /* MyLocationView.m */,
+				6A6C503C1ED6DE5A00A14DA0 /* MyLocationView.xib */,
+				6A6C50351ED53F4800A14DA0 /* MySearchBarView.h */,
+				6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */,
 				6A6C502F1ED53EFD00A14DA0 /* MyCityListView.h */,
 				6A6C50301ED53EFD00A14DA0 /* MyCityListView.m */,
 				6A6C50321ED53F0C00A14DA0 /* MySearchResultView.h */,
 				6A6C50331ED53F0C00A14DA0 /* MySearchResultView.m */,
-				6A6C50351ED53F4800A14DA0 /* MySearchBarView.h */,
-				6A6C50361ED53F4800A14DA0 /* MySearchBarView.m */,
-				6A6C50381ED58CDB00A14DA0 /* MySearchBarView.xib */,
+				6A6C50411ED8313300A14DA0 /* MyLocationHeaderCell.h */,
+				6A6C50421ED8313300A14DA0 /* MyLocationHeaderCell.m */,
+				6A6C50431ED8313300A14DA0 /* MyLocationHeaderCell.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -218,8 +236,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				6A6C501B1ED5261F00A14DA0 /* LaunchScreen.storyboard in Resources */,
+				6A6C503D1ED6DE5A00A14DA0 /* MyLocationView.xib in Resources */,
 				6A6C50181ED5261F00A14DA0 /* Assets.xcassets in Resources */,
-				6A6C50391ED58CDB00A14DA0 /* MySearchBarView.xib in Resources */,
+				6A6C50451ED8313300A14DA0 /* MyLocationHeaderCell.xib in Resources */,
 				6A6C50231ED5384600A14DA0 /* citylist.json in Resources */,
 				6A6C50161ED5261F00A14DA0 /* Main.storyboard in Resources */,
 			);
@@ -280,12 +299,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A6C50481ED9330A00A14DA0 /* AddressSettingViewController.m in Sources */,
 				6A6C50371ED53F4800A14DA0 /* MySearchBarView.m in Sources */,
 				6A6C50131ED5261F00A14DA0 /* ViewController.m in Sources */,
 				6A6C50101ED5261F00A14DA0 /* AppDelegate.m in Sources */,
 				6A6C50271ED5386D00A14DA0 /* MyCity.m in Sources */,
 				6A6C502A1ED5388500A14DA0 /* MyCityManager.m in Sources */,
+				6A6C50441ED8313300A14DA0 /* MyLocationHeaderCell.m in Sources */,
 				6A6C500D1ED5261F00A14DA0 /* main.m in Sources */,
+				6A6C50401ED8261700A14DA0 /* MyRecordManager.m in Sources */,
 				6A6C50341ED53F0C00A14DA0 /* MySearchResultView.m in Sources */,
 				6A6C502E1ED53CD800A14DA0 /* MyLocationView.m in Sources */,
 				6A6C50311ED53EFD00A14DA0 /* MyCityListView.m in Sources */,
