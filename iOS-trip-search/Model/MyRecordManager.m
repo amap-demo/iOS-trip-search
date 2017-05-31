@@ -99,10 +99,29 @@
     
     NSArray *oldHistory = [self historyArray];
     
-    NSMutableArray *array = [NSMutableArray arrayWithArray:oldHistory];
-    [array addObject:poi];
+    if (oldHistory.count < kMaxHistoryCount) {
+        NSMutableArray *array = [NSMutableArray arrayWithArray:oldHistory];
+        [array addObject:poi];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:[array copy]] forKey:kRecordHistoryKey];
+    }
+}
+
+- (NSArray<AMapPOI *> *)historyArrayFilteredByCityName:(NSString *)city
+{
+    NSArray *originArray = [self historyArray];
     
-    [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:[array copy]] forKey:kRecordHistoryKey];
+    if (city.length == 0) {
+        return originArray;
+    }
+    NSMutableArray *filteredArray = [NSMutableArray array];
+    for (AMapPOI *poi in originArray) {
+        if ([poi.city containsString:city]) {
+            [filteredArray addObject:poi];
+        }
+    }
+    
+    return filteredArray;
 }
 
 - (void)clearHistory

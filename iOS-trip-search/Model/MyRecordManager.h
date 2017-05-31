@@ -18,5 +18,8 @@
 @property (nonatomic, readonly) NSArray<AMapPOI *> *historyArray;
 
 - (void)addHistoryRecord:(AMapPOI *)poi;
+
+- (NSArray<AMapPOI *> *)historyArrayFilteredByCityName:(NSString *)city;
+
 - (void)clearHistory;
 @end

@@ -88,33 +88,40 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (!_showsAddressSettingCell && indexPath.section == 0) {
+        return 0;
+    }
+    
     return 60;
+}
+
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger result = self.poiArray.count;
-    if (result == 1) {
-        result += self.historyArray.count;
+    NSInteger result = 0;
+    if (section == 0) {
+        result = 1;
     }
-    
-    if (_showsAddressSettingCell) {
-        result += 1;
+    else if (section == 1) {
+        result = self.historyArray.count;
+    }
+    else if (section == 2) {
+        result = self.poiArray.count;
     }
     
     return result;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *currentIdentifier = kCellIdentifier;
     
-    if (_showsAddressSettingCell && indexPath.row == 0) {
+    if (_showsAddressSettingCell && indexPath.section == 0) {
         currentIdentifier = kLocationCellIdentifier;
         
     }
@@ -131,7 +138,7 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
     
     cell.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
     
-    if (_showsAddressSettingCell && indexPath.row == 0)
+    if (_showsAddressSettingCell && indexPath.section == 0)
     {
         MyLocationHeaderCell *locationCell = (MyLocationHeaderCell *)cell;
         locationCell.delegate = self;
@@ -140,19 +147,16 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
     }
     else
     {
-        NSInteger poiIndex = indexPath.row;
-        if (_showsAddressSettingCell) {
-            poiIndex -= 1;
-        }
-        
+        cell.imageView.image = nil;
         AMapPOI *poi = nil;
-        if (self.historyArray.count == 0)
-        {
-            poi = self.poiArray[poiIndex];
+        
+        if (indexPath.section == 1) {
+            poi = self.historyArray[indexPath.row];
+            cell.imageView.image = [UIImage imageNamed:@"icon_clock"];
         }
-        else
-        {
-            poi = self.historyArray[poiIndex];
+        else if (indexPath.section == 2) {
+            poi = self.poiArray[indexPath.row];
+            cell.imageView.image = [UIImage imageNamed:@"icon_locate"];
         }
         
         cell.textLabel.text = poi.name;
@@ -166,27 +170,20 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
 {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
-    if (_showsAddressSettingCell && indexPath.row == 0)
+    if (_showsAddressSettingCell && indexPath.section == 0)
     {
         
     }
     else
     {
-        NSInteger poiIndex = indexPath.row;
-        if (_showsAddressSettingCell) {
-            poiIndex -= 1;
-        }
-        
         AMapPOI *poi = nil;
-        if (self.historyArray.count == 0)
-        {
-            poi = self.poiArray[poiIndex];
+        if (indexPath.section == 1) {
+            poi = self.historyArray[indexPath.row];
         }
-        else
-        {
-            poi = self.historyArray[poiIndex];
+        else if (indexPath.section == 2) {
+            poi = self.poiArray[indexPath.row];
         }
-        
+
         if ([self.delegate respondsToSelector:@selector(resultListView:didPOISelected:)])
         {
             [self.delegate resultListView:self didPOISelected:poi];

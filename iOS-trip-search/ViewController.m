@@ -108,6 +108,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     self.mapView.rotateEnabled = NO;
     self.mapView.rotateCameraEnabled = NO;
     
+    self.mapView.runLoopMode = NSDefaultRunLoopMode;
     [self.mapView setShowsUserLocation:YES];
     
     [self.view addSubview:self.mapView];
@@ -279,7 +280,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     
     self.searchResultView.hidden = onlyCity;
     if (!onlyCity) {
-        [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:[MyCityManager sharedInstance].currentCity];
+        [self updateSearchResultForCurrentCity];
     }
     
     [self.searchBar reset];
@@ -296,6 +297,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
     [self.searchBar resignFirstResponder];
+    self.searchBar.currentSearchKeywords = nil;
     
     [UIView animateWithDuration:0.3 animations:^{
         self.listContainerView.frame = CGRectMake(kTableViewMargin, CGRectGetMaxY(self.view.bounds), self.listContainerView.frame.size.width, self.listContainerView.frame.size.height);
@@ -304,19 +306,12 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     }];
 }
 
-- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+- (void)updateSearchResultForCurrentCity
 {
-    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
-    request.keywords = keyword;
-    request.cityLimit = YES;
+    self.searchResultView.historyArray = [[MyRecordManager sharedInstance] historyArrayFilteredByCityName:[MyCityManager sharedInstance].currentCity.name];
+    self.searchResultView.poiArray = nil;
     
-    request.city = city.name;
-    
-    //TODO: 需要设置location和sortrule
-    
-    [self.search AMapPOIKeywordsSearch:request];
-    
-    self.currentRequest = request;
+    [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:[MyCityManager sharedInstance].currentCity];
 }
 
 - (void)addPositionAnnotation:(MAPointAnnotation *)annotation forPOI:(AMapPOI *)poi
@@ -357,6 +352,21 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         self.locationView.endPOI = poi;
         [self addPositionAnnotation:self.endAnnotation forPOI:poi];
     }
+}
+
+- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+{
+    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
+    request.keywords = keyword;
+    request.cityLimit = YES;
+    
+    request.city = city.name;
+    
+    //TODO: 需要设置location和sortrule
+    
+    [self.search AMapPOIKeywordsSearch:request];
+    
+    self.currentRequest = request;
 }
 
 - (void)searchReGeocodeWithLocation:(AMapGeoPoint *)location
@@ -423,6 +433,10 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     }
     else {
         [self searchPoiByKeyword:text city:[MyCityManager sharedInstance].currentCity];
+        
+        //搜索的时候不显示历史记录
+        self.searchResultView.historyArray = nil;
+        self.searchResultView.poiArray = nil;
     }
 }
 
@@ -450,25 +464,36 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     MyCity *oldCity = [MyCityManager sharedInstance].currentCity;
     [self updateCurrentCity:city];
     
-    // 城市改变后清空
-    if (![oldCity.name isEqualToString:city.name]) {
-        self.locationView.endPOI = nil;
-        self.locationView.startPOI = nil;
-        // remove
-        [self.mapView removeAnnotation:self.startAnnotation];
-        [self.mapView removeAnnotation:self.endAnnotation];
-        
-    }
-    
+    //单独改变当前城市
     if (!self.searchBar.doubleSearchModeEnable) {
         [self hideCityListView];
         
-        [self searchGeocodeWithName:city.name];
+        // 城市改变后清空
+        if (![oldCity.name isEqualToString:city.name]) {
+            self.locationView.endPOI = nil;
+            self.locationView.startPOI = nil;
+            // remove
+            [self.mapView removeAnnotation:self.startAnnotation];
+            [self.mapView removeAnnotation:self.endAnnotation];
+            
+        }
+        
+        //如果当前城市是定位城市直接进行当前定位的逆地理，否则进行地理编码获取城市位置。
+        if ([city.name isEqualToString:[MyCityManager sharedInstance].locationCity.name]) {
+            
+            [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
+            
+            [self searchReGeocodeWithLocation:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.location.coordinate.latitude longitude:self.mapView.userLocation.location.coordinate.longitude]];
+        }
+        else {
+            [self searchGeocodeWithName:city.name];
+        }
     }
     else {
         
         if (![oldCity.name isEqualToString:city.name]) {
-            [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:[MyCityManager sharedInstance].currentCity];
+            
+            [self updateSearchResultForCurrentCity];
         }
     }
 }
@@ -484,6 +509,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 - (void)resultListView:(MySearchResultView *)listView didPOISelected:(AMapPOI *)poi
 {
     [self setLocationPOI:poi forType:self.currentLocationType];
+    [[MyRecordManager sharedInstance] addHistoryRecord:poi];
     
     [self hideCityListView];
 }
@@ -615,7 +641,15 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     
     if ([MyCityManager sharedInstance].locationCity == nil) {
         [MyCityManager sharedInstance].locationCity = [[MyCity alloc] init];
-        [MyCityManager sharedInstance].locationCity.name = response.regeocode.addressComponent.city;
+        
+        
+        NSString *city = response.regeocode.addressComponent.city;
+        
+        //TODO: 为了和本地数据源保持一直，去掉“市”。
+        if ([city hasSuffix:@"市"]) {
+            city = [city substringToIndex:city.length - 1];
+        }
+        [MyCityManager sharedInstance].locationCity.name = city;
         
         self.cityListView.locationCity = [MyCityManager sharedInstance].locationCity;
         
@@ -640,7 +674,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(geocode.location.latitude, geocode.location.longitude) animated:YES];
     
     [self searchReGeocodeWithLocation:geocode.location];
-    
+//    [self searchPoiByKeyword:nil city:[MyCityManager sharedInstance].currentCity];
     NSLog(@"move to %@ %@", geocode.city, geocode.location.formattedDescription);
     
 }
