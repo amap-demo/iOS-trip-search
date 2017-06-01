@@ -47,7 +47,7 @@
                 </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xtS-dc-1Xv">
                     <rect key="frame" x="30" y="0.0" width="332" height="57.5"/>
-                    <state key="normal" title="获取位置信息中...">
+                    <state key="normal" title="正在获取上车点...">
                         <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>

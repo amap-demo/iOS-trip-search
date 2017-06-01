@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+@class MyCity;
 @class MySearchBarView;
 
 @protocol MySearchBarViewDelegate <NSObject>
@@ -26,9 +26,10 @@
 
 @property (nonatomic, weak) id<MySearchBarViewDelegate> delegate;
 
-@property (nonatomic, copy) NSString *currentCityName;
-@property (nonatomic, copy) NSString *currentSearchKeywords;
+@property (nonatomic, strong) MyCity *seachCity;
+@property (nonatomic, readonly) NSString *currentCityName;
 
+@property (nonatomic, copy) NSString *currentSearchKeywords;
 @property (nonatomic, copy) NSString *searchTextPlaceholder;
 
 @property (nonatomic, assign) BOOL doubleSearchModeEnable;// 同时有city和关键字搜索，默认为NO。

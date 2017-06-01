@@ -99,6 +99,13 @@
     
     NSArray *oldHistory = [self historyArray];
     
+    // 去重
+    for (AMapPOI *aPoi in oldHistory) {
+        if ([aPoi.uid isEqualToString:poi.uid]) {
+            return;
+        }
+    }
+
     if (oldHistory.count < kMaxHistoryCount) {
         NSMutableArray *array = [NSMutableArray arrayWithArray:oldHistory];
         [array addObject:poi];

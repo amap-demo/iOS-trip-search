@@ -44,6 +44,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 @property (nonatomic, strong) AMapSearchAPI *search;
 
 @property (nonatomic, strong) UIButton *titleButton;
+@property (nonatomic, strong) UIButton *leftButton;
+@property (nonatomic, strong) UIButton *confirmButton;
 
 @property (nonatomic, strong) UIView *listContainerView;
 
@@ -58,7 +60,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 @property (nonatomic, strong) AMapPOIKeywordsSearchRequest *currentRequest;
 
-@property (nonatomic, assign) BOOL locationRegeoRequested;
+@property (nonatomic, assign) BOOL locationRegeoRequested; //初次定位逆地理是否请求过
+@property (nonatomic, assign) BOOL regeoSearchNeeded; //地图每次移动后是否需要进行逆地理请求
 
 @property (nonatomic, strong) MAPointAnnotation *startAnnotation;
 @property (nonatomic, strong) MAPointAnnotation *endAnnotation;
@@ -82,6 +85,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     [self initListContainerView];
     
     [self initControlButtons];
+    
+    self.regeoSearchNeeded = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -123,7 +128,6 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 - (void)initTitleButton
 {
     UIButton *titleButton = [[UIButton alloc] init];
-//    titleButton.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.5];
     
     [titleButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     
@@ -137,6 +141,18 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     self.navigationItem.titleView = titleButton;
     
     [self updateTitleWithString:@"定位中..."];
+    
+    //
+    self.leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.leftButton setImage:[UIImage imageNamed:@"icon_back"] forState:UIControlStateNormal];
+    [self.leftButton sizeToFit];
+    
+    [self.leftButton addTarget:self action:@selector(backAction:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithCustomView:self.leftButton];
+    self.navigationItem.leftBarButtonItem = item1;
+    
+    self.leftButton.hidden = YES;
 }
 
 - (void)initSearchBarView
@@ -163,6 +179,21 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     [self.locationView.startButton addTarget:self action:@selector(startLocationTapped:) forControlEvents:UIControlEventTouchUpInside];
     
     [self.locationView.endButton addTarget:self action:@selector(endLocationTapped:) forControlEvents:UIControlEventTouchUpInside];
+    
+    //
+    //
+    self.confirmButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.confirmButton setBackgroundColor:[UIColor colorWithRed:0.29 green:0.30 blue:0.35 alpha:1.00]];
+    
+    [self.confirmButton setTitle:@"确认呼叫" forState:UIControlStateNormal];
+    [self.confirmButton setFrame:CGRectMake(0, 0, self.view.bounds.size.width - kTableViewMargin * 2, kLocationButtonHeight)];
+    self.confirmButton.center = CGPointMake(self.view.center.x, CGRectGetHeight(self.view.bounds) - kLocationButtonHeight / 2.0 - kTableViewMargin);
+    
+    [self.confirmButton addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.confirmButton];
+    
+    self.confirmButton.hidden = YES;
+
 }
 
 - (void)initListContainerView
@@ -236,10 +267,33 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 #pragma mark - handler
 
+- (void)prepareForCall
+{
+    NSLog(@"prepareForCall");
+    
+    self.leftButton.hidden = NO;
+    self.navigationItem.titleView = nil;
+    self.title = @"确认呼叫";
+    self.confirmButton.hidden = NO;
+    self.locationView.hidden = YES;
+}
+
+- (void)resetForLocationChooes
+{
+    NSLog(@"resetForLocationChooes");
+    self.leftButton.hidden = YES;
+    self.locationView.endPOI = nil;
+    [self addPositionAnnotation:self.endAnnotation forPOI:nil];
+    self.navigationItem.titleView = self.titleButton;
+    
+    self.confirmButton.hidden = YES;
+    self.locationView.hidden = NO;
+}
+
 - (void)updateCurrentCity:(MyCity *)currentCity
 {
     [MyCityManager sharedInstance].currentCity = currentCity;
-    self.searchBar.currentCityName = currentCity.name;
+    self.searchBar.seachCity = currentCity;
     
     [self updateTitleWithString:currentCity.name];
 }
@@ -277,6 +331,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     self.searchResultView.poiArray = nil;
     
     self.searchBar.doubleSearchModeEnable = !onlyCity;
+    self.searchBar.seachCity = [MyCityManager sharedInstance].currentCity;
     
     self.searchResultView.hidden = onlyCity;
     if (!onlyCity) {
@@ -308,37 +363,51 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 - (void)updateSearchResultForCurrentCity
 {
-    self.searchResultView.historyArray = [[MyRecordManager sharedInstance] historyArrayFilteredByCityName:[MyCityManager sharedInstance].currentCity.name];
+    self.searchResultView.historyArray = [[MyRecordManager sharedInstance] historyArrayFilteredByCityName:self.searchBar.seachCity.name];
     self.searchResultView.poiArray = nil;
     
-    [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:[MyCityManager sharedInstance].currentCity];
+    [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.searchBar.seachCity];
 }
 
 - (void)addPositionAnnotation:(MAPointAnnotation *)annotation forPOI:(AMapPOI *)poi
 {
-    AMapGeoPoint *location = poi.location;
-    
     NSLog(@"add poi :%@", poi.name);
     
-    // add
-    if (annotation == self.startAnnotation && poi.exitLocation != nil) {
-        location = poi.exitLocation;
+    if (poi == nil) {
+        [self.mapView removeAnnotation:annotation];
     }
-    
-    if (annotation == self.endAnnotation && poi.enterLocation != nil) {
-        location = poi.enterLocation;
+    else {
+        AMapGeoPoint *location = poi.location;
+        
+        // add
+        if (annotation == self.startAnnotation && poi.exitLocation != nil) {
+            location = poi.exitLocation;
+        }
+        
+        if (annotation == self.endAnnotation && poi.enterLocation != nil) {
+            location = poi.enterLocation;
+        }
+        
+        annotation.coordinate = CLLocationCoordinate2DMake(location.latitude, location.longitude);
+        
+        [self.mapView addAnnotation:annotation];
     }
-    
-    annotation.coordinate = CLLocationCoordinate2DMake(location.latitude, location.longitude);
-    
-    [self.mapView addAnnotation:annotation];
     
     if (self.locationView.startPOI && self.locationView.endPOI) {
         [self.mapView showAnnotations:@[self.startAnnotation, self.endAnnotation] edgePadding:UIEdgeInsetsMake(120, 80, 140, 80) animated:YES];
+        
+        //已经有了起点和终点
+        self.startAnnotation.lockedToScreen = NO;
+        self.regeoSearchNeeded = NO;
+        
+        [self prepareForCall];
     }
     else if (self.locationView.startPOI){ // startAnnotation 应该保证一直存在
         [self.mapView showAnnotations:@[self.startAnnotation] animated:NO];
         [self.mapView setZoomLevel:16 animated:YES];
+        
+        self.startAnnotation.lockedScreenPoint = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
+        self.startAnnotation.lockedToScreen = YES;
     }
 }
 
@@ -388,6 +457,16 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 #pragma mark - actions
 
+- (void)confirmAction:(UIButton *)sender
+{
+    NSLog(@"confirm!!!!!");
+}
+
+- (void)backAction:(UIButton *)sender
+{
+    [self resetForLocationChooes];
+}
+
 - (void)onLocationAction:(UIButton *)sender
 {
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;
@@ -398,6 +477,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     NSLog(@"clear the address setting for home & company");
     [MyRecordManager sharedInstance].home = nil;
     [MyRecordManager sharedInstance].company = nil;
+    [[MyRecordManager sharedInstance] clearHistory];
     
     [self.searchResultView updateAddressSetting];
 }
@@ -462,10 +542,13 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 - (void)cityListView:(MyCityListView *)listView didCitySelected:(MyCity *)city
 {
     MyCity *oldCity = [MyCityManager sharedInstance].currentCity;
-    [self updateCurrentCity:city];
     
     //单独改变当前城市
     if (!self.searchBar.doubleSearchModeEnable) {
+        
+        //单独改变城市时修改当前城市
+        [self updateCurrentCity:city];
+        
         [self hideCityListView];
         
         // 城市改变后清空
@@ -492,7 +575,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     else {
         
         if (![oldCity.name isEqualToString:city.name]) {
-            
+            self.searchBar.seachCity = city; // 只修改搜索city
             [self updateSearchResultForCurrentCity];
         }
     }
@@ -563,6 +646,27 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     }
     
     [self locatingCurrentCity];
+}
+
+- (void)mapView:(MAMapView *)mapView mapWillMoveByUser:(BOOL)wasUserAction
+{
+    if (!wasUserAction) {
+        return;
+    }
+    if (self.regeoSearchNeeded) {
+        self.locationView.startPOI = nil;
+    }
+}
+
+- (void)mapView:(MAMapView *)mapView mapDidMoveByUser:(BOOL)wasUserAction
+{
+    if (!wasUserAction) {
+        return;
+    }
+    //移动结束后更新上车点
+    if (self.regeoSearchNeeded) {
+        [self searchReGeocodeWithLocation:[AMapGeoPoint locationWithLatitude:self.mapView.centerCoordinate.latitude longitude:self.mapView.centerCoordinate.longitude]];
+    }
 }
 
 - (MAAnnotationView *)mapView:(MAMapView *)mapView viewForAnnotation:(id<MAAnnotation>)annotation
@@ -674,7 +778,6 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(geocode.location.latitude, geocode.location.longitude) animated:YES];
     
     [self searchReGeocodeWithLocation:geocode.location];
-//    [self searchPoiByKeyword:nil city:[MyCityManager sharedInstance].currentCity];
     NSLog(@"move to %@ %@", geocode.city, geocode.location.formattedDescription);
     
 }

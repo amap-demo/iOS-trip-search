@@ -21,8 +21,8 @@
         [self.startButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     }
     else {
-        [self.startButton setTitle:@"您在哪里" forState:UIControlStateNormal];
-        [self.startButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        [self.startButton setTitle:@"正在获取上车点..." forState:UIControlStateNormal];
+        [self.startButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     }
 }
 

@@ -129,9 +129,9 @@
     _currentCity = currentCity;
     
     if (self.search) {
-        self.searchBar.currentCityName = currentCity.name;
+        self.searchBar.seachCity = currentCity;
         
-        // 城市改变后
+        // 城市改变后，或者需要强制搜索
         if (force || ![oldCity.name isEqualToString:_currentCity.name]) {
             [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.currentCity];
         }

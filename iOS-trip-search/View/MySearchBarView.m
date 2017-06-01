@@ -7,6 +7,7 @@
 //
 
 #import "MySearchBarView.h"
+#import "MyCity.h"
 
 #define kControlMargin 10
 #define kControlBottomMargin 6
@@ -117,6 +118,23 @@
     }
 }
 
+- (void)setSeachCity:(MyCity *)seachCity
+{
+    _seachCity = seachCity;
+    _currentCityName = [_seachCity.name copy];
+    
+    [self updateCityButtonWithTitle:_currentCityName];
+    
+    [self resignFirstResponder];
+    
+    if (_doubleSearchModeEnable) {
+        self.cityButton.hidden = NO;
+        self.citySearchView.hidden = YES;
+        
+        [self updateLayoutWithCitySearchShown:!self.citySearchView.hidden animated:YES];
+    }
+}
+
 - (void)reset
 {
     self.citySearchView.text = @"";
@@ -134,21 +152,6 @@
 - (void)becomeFirstResponder
 {
     [self.searchTextView becomeFirstResponder];
-}
-
-- (void)setCurrentCityName:(NSString *)currentCityName
-{
-    _currentCityName = [currentCityName copy];
-    [self updateCityButtonWithTitle:_currentCityName];
-    
-    [self resignFirstResponder];
-    
-    if (_doubleSearchModeEnable) {
-        self.cityButton.hidden = NO;
-        self.citySearchView.hidden = YES;
-        
-        [self updateLayoutWithCitySearchShown:!self.citySearchView.hidden animated:YES];
-    }    
 }
 
 - (void)updateCityButtonWithTitle:(NSString *)title
