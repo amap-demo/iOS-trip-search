@@ -329,6 +329,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     NSLog(@"title: %@", title);
 }
 
+// 显示搜索&城市列表
 - (void)showCityListViewOnlyCity:(BOOL)onlyCity
 {
     [self.navigationController setNavigationBarHidden:YES animated:YES];
@@ -353,6 +354,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     }];
 }
 
+// 隐藏搜索&城市列表
 - (void)hideCityListView
 {
     [self.navigationController setNavigationBarHidden:NO animated:YES];
@@ -472,6 +474,10 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 - (void)onLocationAction:(UIButton *)sender
 {
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;
+    
+    if (self.regeoSearchNeeded) {
+        [self searchReGeocodeWithLocation:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.location.coordinate.latitude longitude:self.mapView.userLocation.location.coordinate.longitude]];
+    }
 }
 
 - (void)onSettingAction:(UIButton *)sender
