@@ -271,6 +271,9 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 {
     NSLog(@"prepareForCall");
     
+    self.startAnnotation.lockedToScreen = NO;
+    self.regeoSearchNeeded = NO;
+    
     self.leftButton.hidden = NO;
     self.navigationItem.titleView = nil;
     self.title = @"确认呼叫";
@@ -281,11 +284,13 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 - (void)resetForLocationChooes
 {
     NSLog(@"resetForLocationChooes");
-    self.leftButton.hidden = YES;
+    
+    self.regeoSearchNeeded = YES;
     self.locationView.endPOI = nil;
     [self addPositionAnnotation:self.endAnnotation forPOI:nil];
-    self.navigationItem.titleView = self.titleButton;
     
+    self.leftButton.hidden = YES;
+    self.navigationItem.titleView = self.titleButton;
     self.confirmButton.hidden = YES;
     self.locationView.hidden = NO;
 }
@@ -397,9 +402,6 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         [self.mapView showAnnotations:@[self.startAnnotation, self.endAnnotation] edgePadding:UIEdgeInsetsMake(120, 80, 140, 80) animated:YES];
         
         //已经有了起点和终点
-        self.startAnnotation.lockedToScreen = NO;
-        self.regeoSearchNeeded = NO;
-        
         [self prepareForCall];
     }
     else if (self.locationView.startPOI){ // startAnnotation 应该保证一直存在
