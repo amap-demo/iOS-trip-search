@@ -8,6 +8,7 @@
 
 #import "MyRecordManager.h"
 #import <AMapSearchKit/AMapSearchKit.h>
+#import "MyCity.h"
 
 #define kMaxHistoryCount    10
 
@@ -61,6 +62,8 @@
         }
     }
     
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
 }
 
 - (AMapPOI *)company
@@ -83,6 +86,7 @@
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:kRecordCompanyKey];
         }
     }
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (NSArray<AMapPOI *> *)historyArray
@@ -106,12 +110,17 @@
         }
     }
 
-    if (oldHistory.count < kMaxHistoryCount) {
-        NSMutableArray *array = [NSMutableArray arrayWithArray:oldHistory];
-        [array addObject:poi];
-        
-        [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:[array copy]] forKey:kRecordHistoryKey];
+    NSMutableArray *array = [NSMutableArray arrayWithArray:oldHistory];
+    
+    if (oldHistory.count == kMaxHistoryCount) {
+        [array removeObjectAtIndex:array.count - 1];
     }
+    
+    [array addObject:poi];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:[array copy]] forKey:kRecordHistoryKey];
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
 }
 
 - (NSArray<AMapPOI *> *)historyArrayFilteredByCityName:(NSString *)city
@@ -135,7 +144,20 @@
 {
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kRecordHistoryKey]) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:kRecordHistoryKey];
+        
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
++ (AMapPOIKeywordsSearchRequest *)POISearchRequestWithKeyword:(NSString *)keyword inCity:(MyCity *)city
+{
+    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
+    request.keywords = keyword;
+    request.cityLimit = YES;
+    
+    request.city = city.name;
+    //TODO: 需要设置location和sortrule
+    
+    return request;
+}
 @end

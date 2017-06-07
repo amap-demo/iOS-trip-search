@@ -281,9 +281,9 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     self.locationView.hidden = YES;
 }
 
-- (void)resetForLocationChooes
+- (void)resetForLocationChoose
 {
-    NSLog(@"resetForLocationChooes");
+    NSLog(@"resetForLocationChoose");
     
     self.regeoSearchNeeded = YES;
     self.locationView.endPOI = nil;
@@ -429,13 +429,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 - (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
 {
-    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
-    request.keywords = keyword;
-    request.cityLimit = YES;
-    
-    request.city = city.name;
-    
-    //TODO: 需要设置location和sortrule
+    AMapPOIKeywordsSearchRequest *request = [MyRecordManager POISearchRequestWithKeyword:keyword inCity:city];
     
     [self.search AMapPOIKeywordsSearch:request];
     
@@ -468,7 +462,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 - (void)backAction:(UIButton *)sender
 {
-    [self resetForLocationChooes];
+    [self resetForLocationChoose];
 }
 
 - (void)onLocationAction:(UIButton *)sender

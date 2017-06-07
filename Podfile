@@ -6,3 +6,10 @@ target 'iOS-trip-search' do
   pod 'AMap3DMap'
   pod 'AMapSearch'
 end
+
+target 'iOS-trip-search-swift' do
+
+  pod 'AMap3DMap'
+  pod 'AMapSearch'
+end
+

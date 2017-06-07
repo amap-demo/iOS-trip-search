@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 @class AMapPOI;
+@class MyCity;
+@class AMapPOIKeywordsSearchRequest;
 
 @interface MyRecordManager : UIView
 
@@ -22,4 +24,7 @@
 - (NSArray<AMapPOI *> *)historyArrayFilteredByCityName:(NSString *)city;
 
 - (void)clearHistory;
+
++ (AMapPOIKeywordsSearchRequest *)POISearchRequestWithKeyword:(NSString *)keyword inCity:(MyCity *)city;
+
 @end

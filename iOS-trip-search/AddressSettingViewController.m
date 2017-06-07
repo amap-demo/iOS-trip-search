@@ -14,6 +14,7 @@
 #import "MySearchBarView.h"
 
 #import "MyCityManager.h"
+#import "MyRecordManager.h"
 
 #define kTableViewMargin    8
 #define kNaviBarHeight      60
@@ -48,7 +49,7 @@
     self.view.backgroundColor = [UIColor lightGrayColor];
     
     if (_searchTextPlaceholder == nil) {
-        _searchTextPlaceholder = @"出入搜索关键字";
+        _searchTextPlaceholder = @"请输入搜索关键字";
     }
     [self initSearch];
     [self initSearchBarView];
@@ -128,25 +129,17 @@
     
     _currentCity = currentCity;
     
-    if (self.search) {
-        self.searchBar.seachCity = currentCity;
-        
-        // 城市改变后，或者需要强制搜索
-        if (force || ![oldCity.name isEqualToString:_currentCity.name]) {
-            [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.currentCity];
-        }
+    self.searchBar.seachCity = currentCity;
+    
+    // 城市改变后，或者需要强制搜索
+    if (force || ![oldCity.name isEqualToString:_currentCity.name]) {
+        [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.currentCity];
     }
 }
 
 - (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
 {
-    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
-    request.keywords = keyword;
-    request.cityLimit = YES;
-    
-    request.city = city.name;
-    
-    //TODO: 需要设置location和sortrule
+    AMapPOIKeywordsSearchRequest *request = [MyRecordManager POISearchRequestWithKeyword:keyword inCity:city];
     
     [self.search AMapPOIKeywordsSearch:request];
     
@@ -224,40 +217,5 @@
         self.searchResultView.poiArray = response.pois;
     }
 }
-
-//- (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
-//{
-//    if (response.regeocode == nil) {
-//        return;
-//    }
-//    
-//    if ([MyCityManager sharedInstance].locationCity == nil) {
-//        [MyCityManager sharedInstance].locationCity = [[MyCity alloc] init];
-//        [MyCityManager sharedInstance].locationCity.name = response.regeocode.addressComponent.city;
-//        
-//        self.cityListView.locationCity = [MyCityManager sharedInstance].locationCity;
-//        
-//        if ([MyCityManager sharedInstance].currentCity == nil) {
-//            [self updateCurrentCity:[MyCityManager sharedInstance].locationCity];
-//        }
-//        
-//    }
-//    
-//    // just regeo for poi
-//    self.locationView.startPOI = response.regeocode.pois.firstObject;
-//    [self addPositionAnnotation:self.startAnnotation forPOI:self.locationView.startPOI];
-//}
-
-//- (void)onGeocodeSearchDone:(AMapGeocodeSearchRequest *)request response:(AMapGeocodeSearchResponse *)response
-//{
-//    if (response.geocodes.count == 0)
-//    {
-//        return;
-//    }
-//    AMapGeocode *geocode = response.geocodes.firstObject;
-//    [self searchReGeocodeWithLocation:geocode.location];
-//    
-//    NSLog(@"move to %@ %@", geocode.city, geocode.location.formattedDescription);
-//}
 
 @end
