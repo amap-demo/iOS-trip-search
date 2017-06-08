@@ -60,27 +60,124 @@ iOS-trip-search
         self.searchBar.frame = CGRectMake(0, -kNaviBarHeight, self.view.bounds.size.width, kNaviBarHeight);
     }];
 }
-// poi搜索
-- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+
+//选择城市
+- (void)cityListView:(MyCityListView *)listView didCitySelected:(MyCity *)city
 {
-    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
-    request.keywords = keyword;
-    request.cityLimit = YES;
+    MyCity *oldCity = [MyCityManager sharedInstance].currentCity;
     
-    request.city = city.name;
-    
-    //TODO: 需要设置location和sortrule
-    
-    [self.search AMapPOIKeywordsSearch:request];
-    
-    self.currentRequest = request;
+    //单独改变当前城市
+    if (!self.searchBar.doubleSearchModeEnable) {
+        
+        //单独改变城市时修改当前城市
+        [self updateCurrentCity:city];
+        
+        [self hideCityListView];
+        
+        // 城市改变后清空
+        if (![oldCity.name isEqualToString:city.name]) {
+            self.locationView.endPOI = nil;
+            self.locationView.startPOI = nil;
+            // remove
+            [self.mapView removeAnnotation:self.startAnnotation];
+            [self.mapView removeAnnotation:self.endAnnotation];
+            
+        }
+        
+        //如果当前城市是定位城市直接进行当前定位的逆地理，否则进行地理编码获取城市位置。
+        if ([city.name isEqualToString:[MyCityManager sharedInstance].locationCity.name]) {
+            
+            [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
+            
+            [self searchReGeocodeWithLocation:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.location.coordinate.latitude longitude:self.mapView.userLocation.location.coordinate.longitude]];
+        }
+        else {
+            [self searchGeocodeWithName:city.name];
+        }
+    }
+    else {
+        
+        if (![oldCity.name isEqualToString:city.name]) {
+            self.searchBar.seachCity = city; // 只修改搜索city
+            [self updateSearchResultForCurrentCity];
+        }
+    }
 }
+
 
 
 ```
 
 `Swift`
 ```
-暂无
+func showCityListViewOnlyCity(_ onlyCity: Bool) {
+        navigationController?.setNavigationBarHidden(true, animated: true)
+        cityListView.reset()
+        searchResultView.poiArray = nil
+        searchBar.doubleSearchModeEnable = !onlyCity
+        searchBar.seachCity = MyCityManager.sharedInstance().currentCity
+        searchResultView.isHidden = onlyCity
+        if !onlyCity {
+            updateSearchResultForCurrentCity()
+        }
+        searchBar.reset()
+        searchBar.becomeFirstResponder()
+        UIView.animate(withDuration: 0.3, animations: {() -> Void in
+            self.listContainerView.frame = CGRect(x: CGFloat(kTableViewMargin), y: CGFloat(kTableViewMargin + kNaviBarHeight), width: CGFloat(self.listContainerView.frame.size.width), height: CGFloat(self.listContainerView.frame.size.height))
+            self.searchBar.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: CGFloat(self.view.bounds.size.width), height: CGFloat(kNaviBarHeight))
+        })
+    }
+
+    func hideCityListView() {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        searchBar.resignFirstResponder()
+        searchBar.currentSearchKeywords = nil
+        UIView.animate(withDuration: 0.3, animations: {() -> Void in
+            self.listContainerView.frame = CGRect(x: CGFloat(kTableViewMargin), y: CGFloat(self.view.bounds.maxY), width: CGFloat(self.listContainerView.frame.size.width), height: CGFloat(self.listContainerView.frame.size.height))
+            self.searchBar.frame = CGRect(x: CGFloat(0), y: CGFloat(-kNaviBarHeight), width: CGFloat(self.view.bounds.size.width), height: CGFloat(kNaviBarHeight))
+        })
+
+    }
+
+    func cityListView(_ listView: MyCityListView!, didCitySelected city: MyCity!) {
+        let oldCity: MyCity? = MyCityManager.sharedInstance().currentCity
+        //单独改变当前城市
+        if !searchBar.doubleSearchModeEnable {
+            //单独改变城市时修改当前城市
+            updateCurrentCity(city)
+            hideCityListView()
+            // 城市改变后清空
+            if !(oldCity?.name == city.name) {
+                locationView.endPOI = nil
+                locationView.startPOI = nil
+                // remove
+                mapView.removeAnnotation(startAnnotation)
+                mapView.removeAnnotation(endAnnotation)
+            }
+            //如果当前城市是定位城市直接进行当前定位的逆地理，否则进行地理编码获取城市位置。
+            if (city.name == MyCityManager.sharedInstance().locationCity.name) {
+                mapView.setCenter(mapView.userLocation.location.coordinate, animated: true)
+                
+                searchReGeocode(withLocation: AMapGeoPoint.location(withLatitude: CGFloat(mapView.userLocation.location.coordinate.latitude), longitude: CGFloat(mapView.userLocation.location.coordinate.longitude)))
+            }
+            
+            if (city.name == MyCityManager.sharedInstance().locationCity.name) {
+                mapView.setCenter(mapView.userLocation.location.coordinate, animated: true)
+                searchReGeocode(withLocation: AMapGeoPoint.location(withLatitude: CGFloat(mapView.userLocation.location.coordinate.latitude), longitude: CGFloat(mapView.userLocation.location.coordinate.longitude)))
+            }
+            else {
+                searchGeocode(withName: city.name)
+            }
+        }
+        else {
+            if !(oldCity?.name == city.name) {
+                searchBar.seachCity = city
+                // 只修改搜索city
+                updateSearchResultForCurrentCity()
+            }
+        }
+    }
+
+
 ```
 

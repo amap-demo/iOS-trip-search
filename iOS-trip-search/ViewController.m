@@ -734,9 +734,6 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     if (self.currentRequest == request) {
         self.searchResultView.poiArray = response.pois;
     }
-    else {
-//        self.searchResultView.poiArray = nil;
-    }
 }
 
 - (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
@@ -751,7 +748,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         
         NSString *city = response.regeocode.addressComponent.city;
         
-        //TODO: 为了和本地数据源保持一直，去掉“市”。
+        //为了和本地数据源保持一直，去掉“市”。
         if ([city hasSuffix:@"市"]) {
             city = [city substringToIndex:city.length - 1];
         }
