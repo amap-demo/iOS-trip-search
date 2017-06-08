@@ -42,9 +42,20 @@
 		6A6C506A1EE52EC000A14DA0 /* citylist.json in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50221ED5384600A14DA0 /* citylist.json */; };
 		6A6C506C1EE52ED400A14DA0 /* AddressSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6C506B1EE52ED400A14DA0 /* AddressSettingViewController.swift */; };
 		6A6C50DD1EE699B100A14DA0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A6C50171ED5261F00A14DA0 /* Assets.xcassets */; };
+		6A82DB451EE935DF0003B924 /* iOS_trip_searchUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A82DB441EE935DF0003B924 /* iOS_trip_searchUITests.m */; };
 		B09530D0888CA02E644746EC /* libPods-iOS-trip-search-swift.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E61345373D9C337A0E6BEA47 /* libPods-iOS-trip-search-swift.a */; };
 		BCBC54A857053F2A85FDF2D2 /* libPods-iOS-trip-search.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 25992F0C725C0F77658E3B74 /* libPods-iOS-trip-search.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6A82DB471EE935DF0003B924 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A6C50001ED5261F00A14DA0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6A6C50071ED5261F00A14DA0;
+			remoteInfo = "iOS-trip-search";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1D7196CB36B968F13506701A /* Pods-iOS-trip-search-swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-trip-search-swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iOS-trip-search-swift/Pods-iOS-trip-search-swift.debug.xcconfig"; sourceTree = "<group>"; };
@@ -90,6 +101,9 @@
 		6A6C505B1EE4FF6A00A14DA0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6A6C505F1EE5000300A14DA0 /* Swift-Bridge-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Swift-Bridge-Header.h"; sourceTree = "<group>"; };
 		6A6C506B1EE52ED400A14DA0 /* AddressSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressSettingViewController.swift; sourceTree = "<group>"; };
+		6A82DB421EE935DE0003B924 /* iOS-trip-searchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS-trip-searchUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A82DB441EE935DF0003B924 /* iOS_trip_searchUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOS_trip_searchUITests.m; sourceTree = "<group>"; };
+		6A82DB461EE935DF0003B924 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E61345373D9C337A0E6BEA47 /* libPods-iOS-trip-search-swift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-iOS-trip-search-swift.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96B14E8F4D1049415F6E509 /* Pods-iOS-trip-search.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-trip-search.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -111,6 +125,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6A82DB3F1EE935DE0003B924 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -119,6 +140,7 @@
 			children = (
 				6A6C500A1ED5261F00A14DA0 /* iOS-trip-search */,
 				6A6C504E1EE4FF6A00A14DA0 /* iOS-trip-search-swift */,
+				6A82DB431EE935DF0003B924 /* iOS-trip-searchUITests */,
 				6A6C50091ED5261F00A14DA0 /* Products */,
 				D1843EE45B3DCA88AE241F03 /* Pods */,
 				6CF6728954E977157D76F9D1 /* Frameworks */,
@@ -130,6 +152,7 @@
 			children = (
 				6A6C50081ED5261F00A14DA0 /* iOS-trip-search.app */,
 				6A6C504D1EE4FF6A00A14DA0 /* iOS-trip-search-swift.app */,
+				6A82DB421EE935DE0003B924 /* iOS-trip-searchUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -209,6 +232,15 @@
 			path = "iOS-trip-search-swift";
 			sourceTree = "<group>";
 		};
+		6A82DB431EE935DF0003B924 /* iOS-trip-searchUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6A82DB441EE935DF0003B924 /* iOS_trip_searchUITests.m */,
+				6A82DB461EE935DF0003B924 /* Info.plist */,
+			);
+			path = "iOS-trip-searchUITests";
+			sourceTree = "<group>";
+		};
 		6CF6728954E977157D76F9D1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -272,6 +304,24 @@
 			productReference = 6A6C504D1EE4FF6A00A14DA0 /* iOS-trip-search-swift.app */;
 			productType = "com.apple.product-type.application";
 		};
+		6A82DB411EE935DE0003B924 /* iOS-trip-searchUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A82DB4B1EE935DF0003B924 /* Build configuration list for PBXNativeTarget "iOS-trip-searchUITests" */;
+			buildPhases = (
+				6A82DB3E1EE935DE0003B924 /* Sources */,
+				6A82DB3F1EE935DE0003B924 /* Frameworks */,
+				6A82DB401EE935DE0003B924 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6A82DB481EE935DF0003B924 /* PBXTargetDependency */,
+			);
+			name = "iOS-trip-searchUITests";
+			productName = "iOS-trip-searchUITests";
+			productReference = 6A82DB421EE935DE0003B924 /* iOS-trip-searchUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -292,6 +342,12 @@
 						DevelopmentTeam = YMJ372W38W;
 						ProvisioningStyle = Manual;
 					};
+					6A82DB411EE935DE0003B924 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = YMJ372W38W;
+						ProvisioningStyle = Manual;
+						TestTargetID = 6A6C50071ED5261F00A14DA0;
+					};
 				};
 			};
 			buildConfigurationList = 6A6C50031ED5261F00A14DA0 /* Build configuration list for PBXProject "iOS-trip-search" */;
@@ -309,6 +365,7 @@
 			targets = (
 				6A6C50071ED5261F00A14DA0 /* iOS-trip-search */,
 				6A6C504C1EE4FF6A00A14DA0 /* iOS-trip-search-swift */,
+				6A82DB411EE935DE0003B924 /* iOS-trip-searchUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -337,6 +394,13 @@
 				6A6C50DD1EE699B100A14DA0 /* Assets.xcassets in Resources */,
 				6A6C50661EE5008200A14DA0 /* MyLocationHeaderCell.xib in Resources */,
 				6A6C50551EE4FF6A00A14DA0 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6A82DB401EE935DE0003B924 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -473,7 +537,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6A82DB3E1EE935DE0003B924 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A82DB451EE935DF0003B924 /* iOS_trip_searchUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6A82DB481EE935DF0003B924 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6A6C50071ED5261F00A14DA0 /* iOS-trip-search */;
+			targetProxy = 6A82DB471EE935DF0003B924 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		6A6C50141ED5261F00A14DA0 /* Main.storyboard */ = {
@@ -674,6 +754,35 @@
 			};
 			name = Release;
 		};
+		6A82DB491EE935DF0003B924 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVELOPMENT_TEAM = YMJ372W38W;
+				INFOPLIST_FILE = "iOS-trip-searchUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.autonavi.iOS-trip-searchUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "dc33f640-6181-4574-b00d-9cd2874a7f9a";
+				PROVISIONING_PROFILE_SPECIFIER = openPlatform_development;
+				TEST_TARGET_NAME = "iOS-trip-search";
+			};
+			name = Debug;
+		};
+		6A82DB4A1EE935DF0003B924 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = YMJ372W38W;
+				INFOPLIST_FILE = "iOS-trip-searchUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.autonavi.iOS-trip-searchUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "dc33f640-6181-4574-b00d-9cd2874a7f9a";
+				PROVISIONING_PROFILE_SPECIFIER = openPlatform_development;
+				TEST_TARGET_NAME = "iOS-trip-search";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -703,6 +812,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		6A82DB4B1EE935DF0003B924 /* Build configuration list for PBXNativeTarget "iOS-trip-searchUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A82DB491EE935DF0003B924 /* Debug */,
+				6A82DB4A1EE935DF0003B924 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
