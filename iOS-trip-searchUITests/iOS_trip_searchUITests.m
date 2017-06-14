@@ -42,8 +42,6 @@
     
     XCUIElementQuery *tablesQuery = app.tables;
     [tablesQuery.element swipeDown];
-    [tablesQuery.element swipeUp];
-    [tablesQuery.element swipeDown];
     
     XCUIElement *cell = [app.tables.cells elementBoundByIndex:0];
     if (cell.exists) {
@@ -60,12 +58,11 @@
     }
 
     [app.buttons[@"您要去哪"] tap];
-    sleep(1);
     
     XCUIElement *textField = [[app textFields] element];
     [textField typeText:@"西单\n"];
     
-    
+    sleep(1);
     XCUIElement *cellPOI = app.tables.staticTexts[@"西单大悦城"];
     
     if (cellPOI.exists) {
@@ -80,8 +77,6 @@
     else {
         [self recordFailureWithDescription:@"poi search failed" inFile:@__FILE__ atLine:__LINE__ expected:NO];
     }
-    
-    sleep(1);
     
     XCUIElement *navigationBar = app.navigationBars[@"确认呼叫"];
     XCUIElement *button = [navigationBar childrenMatchingType:XCUIElementTypeButton].element;
