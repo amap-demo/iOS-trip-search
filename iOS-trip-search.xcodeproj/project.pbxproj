@@ -104,6 +104,7 @@
 		6A82DB421EE935DE0003B924 /* iOS-trip-searchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS-trip-searchUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A82DB441EE935DF0003B924 /* iOS_trip_searchUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOS_trip_searchUITests.m; sourceTree = "<group>"; };
 		6A82DB461EE935DF0003B924 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6AAA3A1E1EFA616F00205528 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E61345373D9C337A0E6BEA47 /* libPods-iOS-trip-search-swift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-iOS-trip-search-swift.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96B14E8F4D1049415F6E509 /* Pods-iOS-trip-search.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-trip-search.debug.xcconfig"; path = "Pods/Target Support Files/Pods-iOS-trip-search/Pods-iOS-trip-search.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -138,6 +139,7 @@
 		6A6C4FFF1ED5261F00A14DA0 = {
 			isa = PBXGroup;
 			children = (
+				6AAA3A1E1EFA616F00205528 /* README.md */,
 				6A6C500A1ED5261F00A14DA0 /* iOS-trip-search */,
 				6A6C504E1EE4FF6A00A14DA0 /* iOS-trip-search-swift */,
 				6A82DB431EE935DF0003B924 /* iOS-trip-searchUITests */,
@@ -820,6 +822,7 @@
 				6A82DB4A1EE935DF0003B924 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

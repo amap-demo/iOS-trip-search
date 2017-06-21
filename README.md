@@ -13,10 +13,10 @@ iOS-trip-search
 ### 核心类/接口
 | 类    | 接口  | 说明   | 版本  |
 | -----|:-----:|:-----:|:-----:|
-| MyCityManager |  | 城市管理类 |  |
-| MyRecordManager | | 记录管理类 |  |
-| MySearchBarView | | 自定义搜索控件 |  |
-| MyLocationView | | 自定义位置选择控件 |  |
+| MAMapView | setShowsUserLocation  | 开启定位 | V1.0.0 |
+| AMapSearchAPI | AMapPOIKeywordsSearch | POI关键字查询 | V1.0.0 |
+| AMapSearchAPI | AMapReGoecodeSearch | 逆地理编码查询 | V1.0.0 |
+| AMapSearchAPI | AMapGeocodeSearch | 地理编码查询 | V1.0.0 |
 
 
 ### 核心难点
