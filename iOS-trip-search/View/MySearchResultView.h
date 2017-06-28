@@ -8,15 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@class AMapPOI;
+@class MyLocation;
 @class MySearchResultView;
 
 @protocol MySearchResultViewDelegate <NSObject>
 @optional
 
-- (void)resultListView:(MySearchResultView *)listView didPOISelected:(AMapPOI *)poi;
-- (void)resultListView:(MySearchResultView *)listView didHomeSelected:(AMapPOI *)home;
-- (void)resultListView:(MySearchResultView *)listView didCompanySelected:(AMapPOI *)company;
+- (void)resultListView:(MySearchResultView *)listView didPOISelected:(MyLocation *)poi;
+- (void)resultListView:(MySearchResultView *)listView didHomeSelected:(MyLocation *)home;
+- (void)resultListView:(MySearchResultView *)listView didCompanySelected:(MyLocation *)company;
 
 - (void)didResultListViewScroll:(MySearchResultView *)listView;
 @end
@@ -24,13 +24,13 @@
 @interface MySearchResultView : UIView
 @property (nonatomic, weak) id<MySearchResultViewDelegate> delegate;
 
-@property (nonatomic, strong) NSArray<AMapPOI *> *poiArray;
-@property (nonatomic, strong) NSArray<AMapPOI *> *historyArray;
+@property (nonatomic, strong) NSArray<MyLocation *> *poiArray;
+@property (nonatomic, strong) NSArray<MyLocation *> *historyArray;
 
 @property (nonatomic, assign) BOOL showsAddressSettingCell; // 默认YES
 
-@property (nonatomic, readonly) AMapPOI *home;
-@property (nonatomic, readonly) AMapPOI *company;
+@property (nonatomic, readonly) MyLocation *home;
+@property (nonatomic, readonly) MyLocation *company;
 
 - (void)updateAddressSetting;
 

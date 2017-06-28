@@ -13,6 +13,7 @@
 
 #import "MyCityManager.h"
 #import "MyRecordManager.h"
+#import "MyLocation.h"
 
 #import "MyCityListView.h"
 #import "MySearchResultView.h"
@@ -58,7 +59,9 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 @property (nonatomic, assign) CurrentGetLocationType currentLocationType;
 @property (nonatomic, assign) CurrentAddressSettingType currentAddressSettingType;
 
-@property (nonatomic, strong) AMapPOIKeywordsSearchRequest *currentRequest;
+@property (nonatomic, strong) AMapInputTipsSearchRequest *currentTipRequest;
+//@property (nonatomic, strong) AMapPOIKeywordsSearchRequest *currentRequest;
+@property (nonatomic, strong) AMapReGeocodeSearchRequest *currentRegeoRequest;
 
 @property (nonatomic, assign) BOOL locationRegeoRequested; //初次定位逆地理是否请求过
 @property (nonatomic, assign) BOOL regeoSearchNeeded; //地图每次移动后是否需要进行逆地理请求
@@ -286,8 +289,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     NSLog(@"resetForLocationChoose");
     
     self.regeoSearchNeeded = YES;
-    self.locationView.endPOI = nil;
-    [self addPositionAnnotation:self.endAnnotation forPOI:nil];
+    self.locationView.endLocation = nil;
+    [self addPositionAnnotation:self.endAnnotation forLocation:nil];
     
     self.leftButton.hidden = YES;
     self.navigationItem.titleView = self.titleButton;
@@ -373,68 +376,136 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     self.searchResultView.historyArray = [[MyRecordManager sharedInstance] historyArrayFilteredByCityName:self.searchBar.seachCity.name];
     self.searchResultView.poiArray = nil;
     
-    [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.searchBar.seachCity];
+//    [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.searchBar.seachCity];
+    [self searchTipsByKeyword:self.searchBar.currentSearchKeywords city:self.searchBar.seachCity];
 }
 
-- (void)addPositionAnnotation:(MAPointAnnotation *)annotation forPOI:(AMapPOI *)poi
+- (void)addPositionAnnotation:(MAPointAnnotation *)annotation forLocation:(MyLocation *)location
 {
-    NSLog(@"add poi :%@", poi.name);
+    NSLog(@"add location :%@", location.name);
     
-    if (poi == nil) {
+    if (location == nil) {
         [self.mapView removeAnnotation:annotation];
     }
     else {
-        AMapGeoPoint *location = poi.location;
+//        AMapGeoPoint *location = poi.location;
+//        
+//        // add
+//        if (annotation == self.startAnnotation && poi.exitLocation != nil) {
+//            location = poi.exitLocation;
+//        }
+//        
+//        if (annotation == self.endAnnotation && poi.enterLocation != nil) {
+//            location = poi.enterLocation;
+//        }
         
-        // add
-        if (annotation == self.startAnnotation && poi.exitLocation != nil) {
-            location = poi.exitLocation;
-        }
+//        annotation.coordinate = CLLocationCoordinate2DMake(location.latitude, location.longitude);
         
-        if (annotation == self.endAnnotation && poi.enterLocation != nil) {
-            location = poi.enterLocation;
-        }
-        
-        annotation.coordinate = CLLocationCoordinate2DMake(location.latitude, location.longitude);
+        annotation.coordinate = location.coordinate;
         
         [self.mapView addAnnotation:annotation];
     }
     
-    if (self.locationView.startPOI && self.locationView.endPOI) {
+    if (self.locationView.startLocation && self.locationView.endLocation) {
         [self.mapView showAnnotations:@[self.startAnnotation, self.endAnnotation] edgePadding:UIEdgeInsetsMake(120, 80, 140, 80) animated:YES];
         
         //已经有了起点和终点
         [self prepareForCall];
     }
-    else if (self.locationView.startPOI){ // startAnnotation 应该保证一直存在
+    else if (self.locationView.startLocation){ // startAnnotation 应该保证一直存在
         [self.mapView showAnnotations:@[self.startAnnotation] animated:NO];
-        [self.mapView setZoomLevel:16 animated:YES];
+        [self.mapView setZoomLevel:17.5 animated:YES];
         
         self.startAnnotation.lockedScreenPoint = CGPointMake(CGRectGetMidX(self.mapView.bounds), CGRectGetMidY(self.mapView.bounds));
         self.startAnnotation.lockedToScreen = YES;
     }
 }
 
-- (void)setLocationPOI:(AMapPOI *)poi forType:(CurrentGetLocationType)type
+- (void)setLocation:(MyLocation *)location forType:(CurrentGetLocationType)type
 {
     if (type == CurrentGetLocationTypeStart) {
-        self.locationView.startPOI = poi;
-        [self addPositionAnnotation:self.startAnnotation forPOI:poi];
+        self.locationView.startLocation = location;
+        [self addPositionAnnotation:self.startAnnotation forLocation:location];
     }
     else {
-        self.locationView.endPOI = poi;
-        [self addPositionAnnotation:self.endAnnotation forPOI:poi];
+        self.locationView.endLocation = location;
+        [self addPositionAnnotation:self.endAnnotation forLocation:location];
     }
 }
 
-- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+- (void)calculateStartLocationWithRegeocode:(AMapReGeocode *)regeocode
 {
-    AMapPOIKeywordsSearchRequest *request = [MyRecordManager POISearchRequestWithKeyword:keyword inCity:city];
     
-    [self.search AMapPOIKeywordsSearch:request];
+    NSArray<AMapPOI *> *sortedPOI = regeocode.pois;// [regeocode.pois sortedArrayUsingComparator:^NSComparisonResult(AMapPOI * _Nonnull obj1, AMapPOI * _Nonnull obj2) {
+//        return obj1.distance > obj2.distance;
+//    }];
     
-    self.currentRequest = request;
+    NSArray<AMapRoadInter *> *sortedInter = [regeocode.roadinters sortedArrayUsingComparator:^NSComparisonResult(AMapRoadInter * _Nonnull obj1, AMapRoadInter * _Nonnull obj2) {
+        return obj1.distance > obj2.distance;
+    }];
+
+#define kPickupSpotDistanceThreshold    15
+
+    MyLocation *location = [[MyLocation alloc] init];
+    
+    AMapPOI *firstPOI = sortedPOI.firstObject;
+    
+    if (firstPOI) {
+        location.name = [NSString stringWithFormat:@"%@附近", firstPOI.name];
+        location.coordinate = CLLocationCoordinate2DMake(self.currentRegeoRequest.location.latitude, self.currentRegeoRequest.location.longitude);
+        
+        if (firstPOI.distance < kPickupSpotDistanceThreshold) {
+            location.name = firstPOI.name;
+            location.coordinate = CLLocationCoordinate2DMake(firstPOI.location.latitude, firstPOI.location.longitude);
+        }
+    }
+    
+    //如果满足条件，则使用交叉路口
+    AMapRoadInter *firstInter = sortedInter.firstObject;
+    if (firstInter) {
+        if (firstInter.distance < kPickupSpotDistanceThreshold && firstInter.distance < firstPOI.distance) {
+            location.name = [NSString stringWithFormat:@"%@和%@交叉路口", firstInter.firstName, firstInter.secondName];
+            location.coordinate = CLLocationCoordinate2DMake(firstInter.location.latitude, firstInter.location.longitude);
+        }
+    }
+    
+    
+    // just regeo for poi
+    self.locationView.startLocation = location;
+    
+    [self addPositionAnnotation:self.startAnnotation forLocation:self.locationView.startLocation];
 }
+
+#pragma mark - Search
+
+- (void)searchTipsByKeyword:(NSString *)keyword city:(MyCity *)city
+{
+    if (keyword.length == 0) {
+        return;
+    }
+    
+    AMapInputTipsSearchRequest *request = [[AMapInputTipsSearchRequest alloc] init];
+    request.city = city.name;
+    request.cityLimit = YES;
+    request.keywords = keyword;
+    
+    if (self.mapView.userLocation.location) {
+        request.location = [NSString stringWithFormat:@"%f,%f", self.mapView.userLocation.location.coordinate.longitude, self.mapView.userLocation.location.coordinate.latitude];
+    }
+    
+    [self.search AMapInputTipsSearch:request];
+    
+    self.currentTipRequest = request;
+}
+
+//- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+//{
+//    AMapPOIKeywordsSearchRequest *request = [MyRecordManager POISearchRequestWithKeyword:keyword inCity:city];
+//    
+//    [self.search AMapPOIKeywordsSearch:request];
+//    
+//    self.currentRequest = request;
+//}
 
 - (void)searchReGeocodeWithLocation:(AMapGeoPoint *)location
 {
@@ -443,6 +514,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     regeo.location = location;
     regeo.requireExtension = YES;
     [self.search AMapReGoecodeSearch:regeo];
+    
+    self.currentRegeoRequest = regeo;
 }
 
 - (void)searchGeocodeWithName:(NSString *)cityName
@@ -514,8 +587,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         self.cityListView.filterKeywords = text;
     }
     else {
-        [self searchPoiByKeyword:text city:[MyCityManager sharedInstance].currentCity];
         
+        [self searchTipsByKeyword:text city:[MyCityManager sharedInstance].currentCity];
         //搜索的时候不显示历史记录
         self.searchResultView.historyArray = nil;
         self.searchResultView.poiArray = nil;
@@ -555,8 +628,8 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         
         // 城市改变后清空
         if (![oldCity.name isEqualToString:city.name]) {
-            self.locationView.endPOI = nil;
-            self.locationView.startPOI = nil;
+            self.locationView.startLocation = nil;
+            self.locationView.endLocation = nil;
             // remove
             [self.mapView removeAnnotation:self.startAnnotation];
             [self.mapView removeAnnotation:self.endAnnotation];
@@ -591,18 +664,19 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 #pragma mark - MySearchResultViewDelegate
 
-- (void)resultListView:(MySearchResultView *)listView didPOISelected:(AMapPOI *)poi
+- (void)resultListView:(MySearchResultView *)listView didPOISelected:(MyLocation *)poi
 {
-    [self setLocationPOI:poi forType:self.currentLocationType];
+    [self setLocation:poi forType:self.currentLocationType];
     [[MyRecordManager sharedInstance] addHistoryRecord:poi];
     
     [self hideCityListView];
 }
 
-- (void)resultListView:(MySearchResultView *)listView didHomeSelected:(AMapPOI *)home
+- (void)resultListView:(MySearchResultView *)listView didHomeSelected:(MyLocation *)home
 {
     if (home) {
-        [self setLocationPOI:home forType:self.currentLocationType];
+        
+        [self setLocation:home forType:self.currentLocationType];
         [self hideCityListView];
     }
     else {
@@ -616,10 +690,10 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     }
 }
 
-- (void)resultListView:(MySearchResultView *)listView didCompanySelected:(AMapPOI *)company
+- (void)resultListView:(MySearchResultView *)listView didCompanySelected:(MyLocation *)company
 {
     if (company) {
-        [self setLocationPOI:company forType:self.currentLocationType];
+        [self setLocation:company forType:self.currentLocationType];
         [self hideCityListView];
     }
     else {
@@ -656,7 +730,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         return;
     }
     if (self.regeoSearchNeeded) {
-        self.locationView.startPOI = nil;
+        self.locationView.startLocation = nil;
     }
 }
 
@@ -689,7 +763,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
         }
         
         annotationView.image = (annotation == self.startAnnotation) ? [UIImage imageNamed:@"default_navi_route_startpoint"] : [UIImage imageNamed:@"default_navi_route_endpoint"];
-
+        annotationView.centerOffset = CGPointMake(0, -10);
         
         return annotationView;
     }
@@ -700,7 +774,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 #pragma mark - AddressSettingViewControllerDelegate
 
-- (void)addressSettingViewController:(AddressSettingViewController *)viewController didPOISelected:(AMapPOI *)poi
+- (void)addressSettingViewController:(AddressSettingViewController *)viewController didPOISelected:(MyLocation *)poi
 {
     if (self.currentAddressSettingType == CurrentAddressSettingTypeHome) {
         
@@ -729,16 +803,24 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     NSLog(@"search error :%@", error);
 }
 
-- (void)onPOISearchDone:(AMapPOISearchBaseRequest *)request response:(AMapPOISearchResponse *)response
+- (void)onInputTipsSearchDone:(AMapInputTipsSearchRequest *)request response:(AMapInputTipsSearchResponse *)response
 {
-    if (self.currentRequest == request) {
-        self.searchResultView.poiArray = response.pois;
+    if (self.currentTipRequest == request) {
+        NSMutableArray *locations = [NSMutableArray array];
+        for (AMapTip *tip in response.tips) {
+            MyLocation *loc = [MyLocation locationWithTip:tip city:request.city];
+            if (loc) {
+                [locations addObject:loc];
+            }
+        }
+        
+        self.searchResultView.poiArray = locations;
     }
 }
 
 - (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
 {
-    if (response.regeocode == nil) {
+    if (response.regeocode == nil || request != self.currentRegeoRequest) {
         return;
     }
     
@@ -762,9 +844,7 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
     }
     
-    // just regeo for poi
-    self.locationView.startPOI = response.regeocode.pois.firstObject;
-    [self addPositionAnnotation:self.startAnnotation forPOI:self.locationView.startPOI];
+    [self calculateStartLocationWithRegeocode:response.regeocode];
 }
 
 - (void)onGeocodeSearchDone:(AMapGeocodeSearchRequest *)request response:(AMapGeocodeSearchResponse *)response
@@ -777,8 +857,6 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(geocode.location.latitude, geocode.location.longitude) animated:YES];
     
     [self searchReGeocodeWithLocation:geocode.location];
-    NSLog(@"move to %@ %@", geocode.city, geocode.location.formattedDescription);
-    
 }
 
 @end

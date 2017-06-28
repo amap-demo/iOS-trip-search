@@ -58,7 +58,8 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     }()
 
     
-    var currentRequest: AMapPOIKeywordsSearchRequest?
+    var currentRequest: AMapInputTipsSearchRequest?
+    var currentRegeoRequest: AMapReGeocodeSearchRequest?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -210,8 +211,8 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     
     func resetForLocationChoose() {
         regeoSearchNeeded = true
-        locationView.endPOI = nil
-        addPositionAnnotation(endAnnotation, forPOI: nil)
+        locationView.endLocation = nil
+        addPositionAnnotation(endAnnotation, forLocation: nil)
         leftButton.isHidden = true
         navigationItem.titleView = titleButton
         confirmButton.isHidden = true
@@ -275,33 +276,68 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     func updateSearchResultForCurrentCity() {
         searchResultView.historyArray = MyRecordManager.sharedInstance().historyArrayFiltered(byCityName: searchBar.seachCity.name)
         searchResultView.poiArray = nil
-        searchPoi(byKeyword: searchBar.currentSearchKeywords, city: searchBar.seachCity)
+        
+        searchTipsByKeyword(searchBar.currentSearchKeywords, inCity: searchBar.seachCity)
 
     }
     
-    func addPositionAnnotation(_ annotation: MAPointAnnotation!, forPOI poi:AMapPOI?) {
-        if poi == nil {
+    func calculateStartLocationWithRegeocode(_ regeocode: AMapReGeocode!) {
+        let pois = regeocode.pois
+        let sortedInter = regeocode.roadinters.sorted { (obj1, obj2) -> Bool in
+            return obj1.distance > obj2.distance
+        }
+        
+        let pickupSpotDistanceThreshold = 15
+        let location = MyLocation()
+        
+        let firstPOI = pois?.first
+        if firstPOI != nil {
+            location.name = firstPOI!.name + "附近"
+            location.coordinate = CLLocationCoordinate2DMake(CLLocationDegrees(self.currentRegeoRequest!.location.latitude), CLLocationDegrees(self.currentRegeoRequest!.location.longitude))
+            
+            if firstPOI!.distance < pickupSpotDistanceThreshold {
+                location.name = firstPOI!.name
+                location.coordinate = CLLocationCoordinate2DMake(CLLocationDegrees(firstPOI!.location.latitude), CLLocationDegrees(firstPOI!.location.longitude))
+            }
+        }
+        
+        let firstInter = sortedInter.first
+        if firstInter != nil {
+            if firstInter!.distance < pickupSpotDistanceThreshold && firstInter!.distance < firstPOI!.distance {
+                location.name = firstInter!.firstName + "和" + firstInter!.secondName + "交叉路口"
+                location.coordinate = CLLocationCoordinate2DMake(CLLocationDegrees(firstInter!.location.latitude), CLLocationDegrees(firstInter!.location.longitude))
+            }
+        }
+        
+        // just regeo for poi
+        locationView.startLocation = location
+        addPositionAnnotation(startAnnotation, forLocation: location)
+        
+    }
+    
+    func addPositionAnnotation(_ annotation: MAPointAnnotation!, forLocation location: MyLocation?) {
+        if location == nil {
             mapView.removeAnnotation(annotation)
         }
         else {
-            var location: AMapGeoPoint? = poi!.location
-            // add
-            if annotation == startAnnotation && poi!.exitLocation != nil {
-                location = poi!.exitLocation
-            }
-            if annotation == endAnnotation && poi!.enterLocation != nil {
-                location = poi!.enterLocation
-            }
-            annotation.coordinate = CLLocationCoordinate2DMake(Double(location!.latitude), Double(location!.longitude))
+//            var location: AMapGeoPoint? = location!.location
+//            // add
+//            if annotation == startAnnotation && poi!.exitLocation != nil {
+//                location = poi!.exitLocation
+//            }
+//            if annotation == endAnnotation && poi!.enterLocation != nil {
+//                location = poi!.enterLocation
+//            }
+            annotation.coordinate = location!.coordinate
             mapView.addAnnotation(annotation)
         }
         
-        if (locationView.startPOI != nil) && (locationView.endPOI != nil) {
+        if (locationView.startLocation != nil) && (locationView.endLocation != nil) {
             mapView.showAnnotations([startAnnotation, endAnnotation], edgePadding: UIEdgeInsetsMake(120, 80, 140, 80), animated: true)
             //已经有了起点和终点
             prepareForCall()
         }
-        else if (locationView.startPOI != nil) {
+        else if (locationView.startLocation != nil) {
             // startAnnotation 应该保证一直存在
             mapView.showAnnotations([startAnnotation], animated: false)
             mapView.setZoomLevel(16, animated: true)
@@ -311,41 +347,43 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
 
     }
     
-    func setLocationPOI(_ poi: AMapPOI?, forType type:CurrentGetLocationType) {
+    func setLocation(_ location: MyLocation?, forType type:CurrentGetLocationType) {
         if type == .start {
-            self.locationView.startPOI = poi
-            addPositionAnnotation(startAnnotation, forPOI: poi)
+            self.locationView.startLocation = location
+            addPositionAnnotation(startAnnotation, forLocation: location)
         }
         else {
-            locationView.endPOI = poi
-            addPositionAnnotation(endAnnotation, forPOI: poi)
-        }
-        
-        if (locationView.startPOI != nil) && (locationView.endPOI != nil) {
-            mapView.showAnnotations([startAnnotation, endAnnotation], edgePadding: UIEdgeInsetsMake(120, 80, 140, 80), animated: true)
-            //已经有了起点和终点
-            prepareForCall()
-        }
-        else if (locationView.startPOI != nil) {
-            // startAnnotation 应该保证一直存在
-            mapView.showAnnotations([startAnnotation], animated: false)
-            mapView.setZoomLevel(16, animated: true)
-            startAnnotation.lockedScreenPoint = CGPoint(x: CGFloat(mapView.bounds.midX), y: CGFloat(mapView.bounds.midY))
-            startAnnotation.isLockedToScreen = true
+            locationView.endLocation = location
+            addPositionAnnotation(endAnnotation, forLocation: location)
         }
     }
 
-    func searchPoi(byKeyword keyword: String?, city: MyCity!) {
-        let request = MyRecordManager.poiSearchRequest(withKeyword: keyword, in: city)
-        search.aMapPOIKeywordsSearch(request)
+//    func searchPoi(byKeyword keyword: String?, city: MyCity!) {
+//        let request = MyRecordManager.poiSearchRequest(withKeyword: keyword, in: city)
+//        search.aMapPOIKeywordsSearch(request)
+//        currentRequest = request
+//    }
+
+    func searchTipsByKeyword(_ keyword: String?, inCity city: MyCity?) {
+        if keyword?.characters.count == 0 {
+            return
+        }
+        
+        let request = AMapInputTipsSearchRequest()
+        
+        request.city = city?.name
+        request.cityLimit = true
+        request.keywords = keyword
+        search.aMapInputTipsSearch(request)
         currentRequest = request
     }
     
     func searchReGeocode(withLocation location: AMapGeoPoint!) {
-        let regeo = AMapReGeocodeSearchRequest()
-        regeo.location = location
-        regeo.requireExtension = true
-        search.aMapReGoecodeSearch(regeo)
+        let request = AMapReGeocodeSearchRequest()
+        request.location = location
+        request.requireExtension = true
+        search.aMapReGoecodeSearch(request)
+        currentRegeoRequest = request
     }
     
     func searchGeocode(withName cityName: String!) {
@@ -407,8 +445,8 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
             hideCityListView()
             // 城市改变后清空
             if !(oldCity?.name == city.name) {
-                locationView.endPOI = nil
-                locationView.startPOI = nil
+                locationView.startLocation = nil
+                locationView.endLocation = nil
                 // remove
                 mapView.removeAnnotation(startAnnotation)
                 mapView.removeAnnotation(endAnnotation)
@@ -443,15 +481,15 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     
     //MARK: - MySearchResultViewDelegate
     
-    func resultListView(_ listView: MySearchResultView!, didPOISelected poi: AMapPOI!) {
-        setLocationPOI(poi, forType: currentLocationType)
+    func resultListView(_ listView: MySearchResultView!, didPOISelected poi: MyLocation!) {
+        setLocation(poi, forType: currentLocationType)
         MyRecordManager.sharedInstance().addHistoryRecord(poi)
         hideCityListView()
     }
     
-    func resultListView(_ listView: MySearchResultView!, didHomeSelected home: AMapPOI!) {
+    func resultListView(_ listView: MySearchResultView!, didHomeSelected home: MyLocation!) {
         if (home != nil) {
-            setLocationPOI(home, forType: currentLocationType)
+            setLocation(home, forType: currentLocationType)
             hideCityListView()
         }
         else {
@@ -465,9 +503,9 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
         }
     }
     
-    func resultListView(_ listView: MySearchResultView!, didCompanySelected company: AMapPOI!) {
+    func resultListView(_ listView: MySearchResultView!, didCompanySelected company: MyLocation!) {
         if (company != nil) {
-            setLocationPOI(company, forType: currentLocationType)
+            setLocation(company, forType: currentLocationType)
             hideCityListView()
         }
         else {
@@ -491,7 +529,7 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
             cityListView.filterKeywords = text
         }
         else {
-            searchPoi(byKeyword: text, city: MyCityManager.sharedInstance().currentCity)
+            searchTipsByKeyword(text, inCity: MyCityManager.sharedInstance().currentCity)
             //搜索的时候不显示历史记录
             searchResultView.historyArray = nil
             searchResultView.poiArray = nil
@@ -513,7 +551,7 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     }
 
     //MARK: - AddressSettingViewControllerDelegate
-    func addressSettingViewController(_ viewController: AddressSettingViewController, didPOISelected poi: AMapPOI!) {
+    func addressSettingViewController(_ viewController: AddressSettingViewController, didPOISelected poi: MyLocation!) {
         if currentAddressSettingType == .home {
             MyRecordManager.sharedInstance().home = poi
         }
@@ -536,12 +574,28 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
         print("search error :\(error)")
     }
     
-    func onPOISearchDone(_ request: AMapPOISearchBaseRequest!, response: AMapPOISearchResponse!) {
-        if self.currentRequest != nil && self.currentRequest! == request {
-            self.searchResultView.poiArray = response.pois
-        }
-    }
+//    func onPOISearchDone(_ request: AMapPOISearchBaseRequest!, response: AMapPOISearchResponse!) {
+//        if self.currentRequest != nil && self.currentRequest! == request {
+//            self.searchResultView.poiArray = response.pois
+//        }
+//    }
 
+    func onInputTipsSearchDone(_ request: AMapInputTipsSearchRequest!, response: AMapInputTipsSearchResponse!) {
+        if self.currentRequest != nil && self.currentRequest! == request {
+            
+            var locations = [MyLocation]()
+            for tip in response.tips {
+                let loc = MyLocation(tip: tip, city: request.city)
+                
+                if loc != nil {
+                    locations.append(loc!)
+                }
+            }
+            self.searchResultView.poiArray = locations;
+        }
+        
+    }
+    
     func onReGeocodeSearchDone(_ request: AMapReGeocodeSearchRequest!, response: AMapReGeocodeSearchResponse!) {
         if response.regeocode == nil {
             return
@@ -560,9 +614,8 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
                 updateCurrentCity(MyCityManager.sharedInstance().locationCity)
             }
         }
-        // just regeo for poi
-        locationView.startPOI = response.regeocode.pois.first
-        addPositionAnnotation(startAnnotation, forPOI: locationView.startPOI)
+        
+        calculateStartLocationWithRegeocode(response.regeocode)
     }
     
     func onGeocodeSearchDone(_ request: AMapGeocodeSearchRequest!, response: AMapGeocodeSearchResponse!) {
@@ -591,7 +644,7 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
             return
         }
         if self.regeoSearchNeeded {
-            self.locationView.startPOI = nil
+            self.locationView.startLocation = nil
         }
     }
     
@@ -617,6 +670,8 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
                 annotationView?.canShowCallout = false
             }
             annotationView?.image = annotation.isEqual(startAnnotation) ? UIImage(named: "default_navi_route_startpoint") : UIImage(named: "default_navi_route_endpoint")
+            
+            annotationView?.centerOffset = CGPoint(x: 0, y: -10)
             return annotationView
         }
         return nil

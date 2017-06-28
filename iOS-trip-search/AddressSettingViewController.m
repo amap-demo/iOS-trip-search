@@ -8,7 +8,7 @@
 
 #import "AddressSettingViewController.h"
 #import <AMapSearchKit/AMapSearchKit.h>
-
+#import "MyLocation.h"
 #import "MyCityListView.h"
 #import "MySearchResultView.h"
 #import "MySearchBarView.h"
@@ -32,7 +32,7 @@
 
 @property (nonatomic, strong) MySearchBarView *searchBar;
 
-@property (nonatomic, strong) AMapPOIKeywordsSearchRequest *currentRequest;
+@property (nonatomic, strong) AMapInputTipsSearchRequest *currentTipRequest;
 
 @end
 
@@ -133,17 +133,33 @@
     
     // 城市改变后，或者需要强制搜索
     if (force || ![oldCity.name isEqualToString:_currentCity.name]) {
-        [self searchPoiByKeyword:self.searchBar.currentSearchKeywords city:self.currentCity];
+        [self searchTipsByKeyword:self.searchBar.currentSearchKeywords city:self.currentCity];
     }
 }
 
-- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+//- (void)searchPoiByKeyword:(NSString *)keyword city:(MyCity *)city
+//{
+//    AMapPOIKeywordsSearchRequest *request = [MyRecordManager POISearchRequestWithKeyword:keyword inCity:city];
+//    
+//    [self.search AMapPOIKeywordsSearch:request];
+//    
+//    self.currentRequest = request;
+//}
+
+- (void)searchTipsByKeyword:(NSString *)keyword city:(MyCity *)city
 {
-    AMapPOIKeywordsSearchRequest *request = [MyRecordManager POISearchRequestWithKeyword:keyword inCity:city];
+    if (keyword.length == 0) {
+        return;
+    }
     
-    [self.search AMapPOIKeywordsSearch:request];
+    AMapInputTipsSearchRequest *request = [[AMapInputTipsSearchRequest alloc] init];
+    request.city = city.name;
+    request.cityLimit = YES;
+    request.keywords = keyword;
     
-    self.currentRequest = request;
+    [self.search AMapInputTipsSearch:request];
+    
+    self.currentTipRequest = request;
 }
 
 #pragma mark - MySearchBarViewDelegate
@@ -154,7 +170,7 @@
         self.cityListView.filterKeywords = text;
     }
     else {
-        [self searchPoiByKeyword:text city:self.currentCity];
+        [self searchTipsByKeyword:text city:self.currentCity];
     }
 }
 
@@ -192,7 +208,7 @@
 
 #pragma mark - MySearchResultViewDelegate
 
-- (void)resultListView:(MySearchResultView *)listView didPOISelected:(AMapPOI *)poi
+- (void)resultListView:(MySearchResultView *)listView didPOISelected:(MyLocation *)poi
 {
     if ([self.delegate respondsToSelector:@selector(addressSettingViewController:didPOISelected:)]) {
         [self.delegate addressSettingViewController:self didPOISelected:poi];
@@ -211,11 +227,26 @@
     NSLog(@"search error :%@", error);
 }
 
-- (void)onPOISearchDone:(AMapPOISearchBaseRequest *)request response:(AMapPOISearchResponse *)response
+- (void)onInputTipsSearchDone:(AMapInputTipsSearchRequest *)request response:(AMapInputTipsSearchResponse *)response
 {
-    if (self.currentRequest == request) {
-        self.searchResultView.poiArray = response.pois;
+    if (self.currentTipRequest == request) {
+        NSMutableArray *locations = [NSMutableArray array];
+        for (AMapTip *tip in response.tips) {
+            MyLocation *loc = [MyLocation locationWithTip:tip city:request.city];
+            if (loc) {
+                [locations addObject:loc];
+            }
+        }
+        
+        self.searchResultView.poiArray = locations;
     }
 }
+
+//- (void)onPOISearchDone:(AMapPOISearchBaseRequest *)request response:(AMapPOISearchResponse *)response
+//{
+//    if (self.currentRequest == request) {
+//        self.searchResultView.poiArray = response.pois;
+//    }
+//}
 
 @end

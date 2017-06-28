@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-@class AMapPOI;
+@class MyLocation;
 @class MyCity;
 @class AMapPOIKeywordsSearchRequest;
 
@@ -15,13 +15,13 @@
 
 + (instancetype)sharedInstance;
 
-@property (nonatomic, strong) AMapPOI *home;
-@property (nonatomic, strong) AMapPOI *company;
-@property (nonatomic, readonly) NSArray<AMapPOI *> *historyArray;
+@property (nonatomic, strong) MyLocation *home;
+@property (nonatomic, strong) MyLocation *company;
+@property (nonatomic, readonly) NSArray<MyLocation *> *historyArray;
 
-- (void)addHistoryRecord:(AMapPOI *)poi;
+- (void)addHistoryRecord:(MyLocation *)location;
 
-- (NSArray<AMapPOI *> *)historyArrayFilteredByCityName:(NSString *)city;
+- (NSArray<MyLocation *> *)historyArrayFilteredByCityName:(NSString *)city;
 
 - (void)clearHistory;
 

@@ -9,13 +9,13 @@
 #import <UIKit/UIKit.h>
 
 @class AddressSettingViewController;
-@class AMapPOI;
+@class MyLocation;
 @class MyCity;
 
 @protocol AddressSettingViewControllerDelegate <NSObject>
 @optional
 
-- (void)addressSettingViewController:(AddressSettingViewController *)viewController didPOISelected:(AMapPOI *)poi;
+- (void)addressSettingViewController:(AddressSettingViewController *)viewController didPOISelected:(MyLocation *)poi;
 - (void)didCancelButtonTappedForAddressSettingViewController:(AddressSettingViewController *)viewController;
 
 @end

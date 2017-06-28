@@ -22,6 +22,6 @@
 #import "MySearchBarView.h"
 #import "MyLocationView.h"
 #import "MyLocationHeaderCell.h"
-
+#import "MyLocation.h"
 
 #endif /* Swift_Bridge_Header_h */

@@ -7,8 +7,9 @@
 //
 
 #import "MyRecordManager.h"
-#import <AMapSearchKit/AMapSearchKit.h>
+#import "MyLocation.h"
 #import "MyCity.h"
+#import <AMapSearchKit/AMapSearchKit.h>
 
 #define kMaxHistoryCount    10
 
@@ -42,7 +43,7 @@
 
 #pragma mark - Interfaces
 
-- (AMapPOI *)home
+- (MyLocation *)home
 {
     NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:kRecordHomeKey];
     if (data) {
@@ -51,7 +52,7 @@
     return nil;
 }
 
-- (void)setHome:(AMapPOI *)home
+- (void)setHome:(MyLocation *)home
 {
     if (home) {
         [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:home] forKey:kRecordHomeKey];
@@ -66,7 +67,7 @@
     
 }
 
-- (AMapPOI *)company
+- (MyLocation *)company
 {
     NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:kRecordCompanyKey];
     if (data) {
@@ -75,7 +76,7 @@
     return nil;
 }
 
-- (void)setCompany:(AMapPOI *)company
+- (void)setCompany:(MyLocation *)company
 {
     if (company) {
         [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:company] forKey:kRecordCompanyKey];
@@ -89,23 +90,23 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (NSArray<AMapPOI *> *)historyArray
+- (NSArray<MyLocation *> *)historyArray
 {
     NSArray *item = [NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:kRecordHistoryKey]];
     return item;
 }
 
-- (void)addHistoryRecord:(AMapPOI *)poi
+- (void)addHistoryRecord:(MyLocation *)location
 {
-    if (poi == nil) {
+    if (location == nil) {
         return;
     }
     
     NSArray *oldHistory = [self historyArray];
     
     // 去重
-    for (AMapPOI *aPoi in oldHistory) {
-        if ([aPoi.uid isEqualToString:poi.uid]) {
+    for (MyLocation *aPoi in oldHistory) {
+        if ([aPoi.name isEqualToString:location.name]) {
             return;
         }
     }
@@ -116,14 +117,14 @@
         [array removeObjectAtIndex:array.count - 1];
     }
     
-    [array addObject:poi];
+    [array addObject:location];
     [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:[array copy]] forKey:kRecordHistoryKey];
     
     [[NSUserDefaults standardUserDefaults] synchronize];
     
 }
 
-- (NSArray<AMapPOI *> *)historyArrayFilteredByCityName:(NSString *)city
+- (NSArray<MyLocation *> *)historyArrayFilteredByCityName:(NSString *)city
 {
     NSArray *originArray = [self historyArray];
     
@@ -131,9 +132,9 @@
         return originArray;
     }
     NSMutableArray *filteredArray = [NSMutableArray array];
-    for (AMapPOI *poi in originArray) {
-        if ([poi.city containsString:city]) {
-            [filteredArray addObject:poi];
+    for (MyLocation *loc in originArray) {
+        if ([loc.city containsString:city]) {
+            [filteredArray addObject:loc];
         }
     }
     

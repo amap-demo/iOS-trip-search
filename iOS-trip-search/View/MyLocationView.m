@@ -7,17 +7,17 @@
 //
 
 #import "MyLocationView.h"
-#import <AMapSearchKit/AMapSearchKit.h>
+#import "MyLocation.h"
 
 @implementation MyLocationView
 
 
-- (void)setStartPOI:(AMapPOI *)startPOI
+- (void)setStartLocation:(MyLocation *)startLocation
 {
-    _startPOI = startPOI;
+    _startLocation = startLocation;
     
-    if (_startPOI) {
-        [self.startButton setTitle:_startPOI.name forState:UIControlStateNormal];
+    if (_startLocation) {
+        [self.startButton setTitle:_startLocation.name forState:UIControlStateNormal];
         [self.startButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     }
     else {
@@ -27,12 +27,12 @@
 }
 
 
-- (void)setEndPOI:(AMapPOI *)endPOI
+- (void)setEndLocation:(MyLocation *)endLocation
 {
-    _endPOI = endPOI;
+    _endLocation = endLocation;
     
-    if (_endPOI) {
-        [self.endButton setTitle:_endPOI.name forState:UIControlStateNormal];
+    if (_endLocation) {
+        [self.endButton setTitle:_endLocation.name forState:UIControlStateNormal];
         [self.endButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     }
     else {

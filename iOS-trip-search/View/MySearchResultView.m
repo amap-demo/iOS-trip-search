@@ -7,15 +7,15 @@
 //
 
 #import "MySearchResultView.h"
-#import <AMapSearchKit/AMapSearchKit.h>
 #import "MyLocationHeaderCell.h"
 #import "MyRecordManager.h"
+#import "MyLocation.h"
 
 @interface MySearchResultView ()<UITableViewDelegate, UITableViewDataSource, MyLocationHeaderCellDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) AMapPOI *home;
-@property (nonatomic, strong) AMapPOI *company;
+@property (nonatomic, strong) MyLocation *home;
+@property (nonatomic, strong) MyLocation *company;
 
 @end
 
@@ -62,14 +62,14 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
     [self.tableView reloadData];
 }
 
-- (void)setPoiArray:(NSArray<AMapPOI *> *)poiArray
+- (void)setPoiArray:(NSArray<MyLocation *> *)poiArray
 {
     _poiArray = poiArray;
     
     [self.tableView reloadData];
 }
 
-- (void)setHistoryArray:(NSArray<AMapPOI *> *)historyArray
+- (void)setHistoryArray:(NSArray<MyLocation *> *)historyArray
 {
     _historyArray = historyArray;
     
@@ -148,7 +148,7 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
     else
     {
         cell.imageView.image = nil;
-        AMapPOI *poi = nil;
+        MyLocation *poi = nil;
         
         if (indexPath.section == 1) {
             poi = self.historyArray[indexPath.row];
@@ -176,7 +176,7 @@ static NSString *kLocationCellIdentifier = @"locationCellIdentifier";
     }
     else
     {
-        AMapPOI *poi = nil;
+        MyLocation *poi = nil;
         if (indexPath.section == 1) {
             poi = self.historyArray[indexPath.row];
         }

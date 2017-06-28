@@ -13,7 +13,7 @@ fileprivate let kNaviBarHeight: CGFloat = 60.0
 
 protocol AddressSettingViewControllerDelegate: NSObjectProtocol {
     
-    func addressSettingViewController(_ viewController: AddressSettingViewController, didPOISelected poi: AMapPOI!)
+    func addressSettingViewController(_ viewController: AddressSettingViewController, didPOISelected poi: MyLocation!)
 
     func didCancelButtonTappedForAddressSettingViewController(_ viewController: AddressSettingViewController)
 }
@@ -28,7 +28,7 @@ class AddressSettingViewController: UIViewController, AMapSearchDelegate, MyCity
     private var searchBar: MySearchBarView!
     private var searchResultView: MySearchResultView!
     
-    private var currentRequest: AMapPOIKeywordsSearchRequest?
+    private var currentRequest: AMapInputTipsSearchRequest?
     
     
     public weak var delegate: AddressSettingViewControllerDelegate?
@@ -120,15 +120,29 @@ class AddressSettingViewController: UIViewController, AMapSearchDelegate, MyCity
         
         // 城市改变后，或者需要强制搜索
         if force || !(oldCity?.name == self.currentCity?.name) {
-            self.searchPoiByKeyword(self.searchBar.currentSearchKeywords, inCity: self.currentCity)
+            self.searchTipsByKeyword(self.searchBar.currentSearchKeywords, inCity: self.currentCity)
         }
         
     }
     
-    func searchPoiByKeyword(_ keyword: String?, inCity city: MyCity?) {
+//    func searchPoiByKeyword(_ keyword: String?, inCity city: MyCity?) {
+//        
+//        let request = MyRecordManager.poiSearchRequest(withKeyword: keyword, in: city)
+//        search.aMapPOIKeywordsSearch(request)
+//        currentRequest = request
+//    }
+    
+    func searchTipsByKeyword(_ keyword: String?, inCity city: MyCity?) {
+        if keyword?.characters.count == 0 {
+            return
+        }
         
-        let request = MyRecordManager.poiSearchRequest(withKeyword: keyword, in: city)
-        search.aMapPOIKeywordsSearch(request)
+        let request = AMapInputTipsSearchRequest()
+        
+        request.city = city?.name
+        request.cityLimit = true
+        request.keywords = keyword
+        search.aMapInputTipsSearch(request)
         currentRequest = request
     }
     
@@ -138,7 +152,7 @@ class AddressSettingViewController: UIViewController, AMapSearchDelegate, MyCity
             self.cityListView.filterKeywords = text
         }
         else {
-            self.searchPoiByKeyword(text, inCity: self.currentCity)
+            self.searchTipsByKeyword(text, inCity: self.currentCity)
         }
     }
     
@@ -170,7 +184,8 @@ class AddressSettingViewController: UIViewController, AMapSearchDelegate, MyCity
     
     //MARK: - MySearchResultViewDelegate
     
-    func resultListView(_ listView: MySearchResultView!, didPOISelected poi: AMapPOI!) {
+    
+    func resultListView(_ listView: MySearchResultView!, didPOISelected poi: MyLocation!) {
         if delegate != nil {
             delegate?.addressSettingViewController(self, didPOISelected: poi)
         }
@@ -185,10 +200,26 @@ class AddressSettingViewController: UIViewController, AMapSearchDelegate, MyCity
         print("search error :\(error)")
     }
     
-    func onPOISearchDone(_ request: AMapPOISearchBaseRequest!, response: AMapPOISearchResponse!) {
+    func onInputTipsSearchDone(_ request: AMapInputTipsSearchRequest!, response: AMapInputTipsSearchResponse!) {
         if self.currentRequest != nil && self.currentRequest! == request {
-            self.searchResultView.poiArray = response.pois
+            
+            var locations = [MyLocation]()
+            for tip in response.tips {
+                let loc = MyLocation(tip: tip, city: request.city)
+                
+                if loc != nil {
+                    locations.append(loc!)
+                }
+            }
+            self.searchResultView.poiArray = locations;
         }
+
     }
     
+//    func onPOISearchDone(_ request: AMapPOISearchBaseRequest!, response: AMapPOISearchResponse!) {
+//        if self.currentRequest != nil && self.currentRequest! == request {
+//            self.searchResultView.poiArray = response.pois
+//        }
+//    }
+//    
 }
