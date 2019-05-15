@@ -715,6 +715,10 @@ typedef NS_ENUM(NSInteger, CurrentAddressSettingType)
 
 #pragma mark - MAMapViewDelegate
 
+- (void)mapViewRequireLocationAuth:(CLLocationManager *)locationManager {
+    [locationManager requestAlwaysAuthorization];
+}
+
 - (void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation updatingLocation:(BOOL)updatingLocation
 {
     if (!updatingLocation) {

@@ -394,20 +394,20 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     }
 
     //MARK: - Actions
-    func titleButtonTapped(_ sender: UIButton!) {
+    @objc func titleButtonTapped(_ sender: UIButton!) {
         self.searchBar.searchTextPlaceholder = "请输入出发城市"
         self.showCityListViewOnlyCity(true)
     }
     
-    func confirmAction(_ sender: UIButton!) {
+    @objc func confirmAction(_ sender: UIButton!) {
         print("confirmAction");
     }
     
-    func backAction(_ sender: UIButton!) {
+    @objc func backAction(_ sender: UIButton!) {
         self.resetForLocationChoose()
     }
     
-    func onLocationAction(_ sender: UIButton!) {
+    @objc func onLocationAction(_ sender: UIButton!) {
         
         self.mapView.userTrackingMode = MAUserTrackingMode.follow
         if self.regeoSearchNeeded {
@@ -415,7 +415,7 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
         }
     }
     
-    func onSettingAction(_ sender: UIButton!) {
+    @objc func onSettingAction(_ sender: UIButton!) {
         print("clear the address setting for home & company")
         MyRecordManager.sharedInstance().home = nil
         MyRecordManager.sharedInstance().company = nil
@@ -423,13 +423,13 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
         searchResultView.updateAddressSetting()
     }
     
-    func startLocationTapped(_ sender: UIButton!) {
+    @objc func startLocationTapped(_ sender: UIButton!) {
         currentLocationType = .start
         searchBar.searchTextPlaceholder = "您现在在哪儿"
         showCityListViewOnlyCity(false)
     }
     
-    func endLocationTapped(_ sender: UIButton!) {
+    @objc func endLocationTapped(_ sender: UIButton!) {
         currentLocationType = .end
         searchBar.searchTextPlaceholder = "您要去哪儿"
         showCityListViewOnlyCity(false)
@@ -630,6 +630,10 @@ class ViewController: UIViewController, MAMapViewDelegate, AMapSearchDelegate, M
     }
     
     //MARK: - MAMapViewDelegate
+    
+    func mapViewRequireLocationAuth(_ locationManager: CLLocationManager!) {
+        locationManager.requestAlwaysAuthorization()
+    }
     
     func mapView(_ mapView: MAMapView!, didUpdate userLocation: MAUserLocation!, updatingLocation: Bool) {
         if !updatingLocation {
